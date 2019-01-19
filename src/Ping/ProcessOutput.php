@@ -3,10 +3,15 @@ declare(strict_types = 1);
 
 namespace Innmind\FileWatch\Ping;
 
-use Innmind\FileWatch\Ping;
+use Innmind\FileWatch\{
+    Ping,
+    Exception\WatchFailed,
+};
 use Innmind\Server\Control\Server\{
     Processes,
     Command,
+    Process,
+    Signal,
 };
 
 final class ProcessOutput implements Ping
@@ -22,12 +27,33 @@ final class ProcessOutput implements Ping
 
     public function __invoke(callable $ping): void
     {
-        $this
-            ->processes
-            ->execute($this->command)
-            ->output()
-            ->foreach(static function() use ($ping): void {
-                $ping();
-            });
+        $process = $this->processes->execute($this->command);
+
+        try {
+            $process
+                ->output()
+                ->foreach(static function() use ($ping): void {
+                    $ping();
+                });
+
+            if (!$process->exitCode()->isSuccessful()) {
+                throw new WatchFailed((string) $this->command);
+            }
+        } catch (WatchFailed $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            $this->kill($process);
+
+            throw $e;
+        }
+    }
+
+    private function kill(Process $process): void
+    {
+        if (!$process->isRunning()) {
+            return;
+        }
+
+        $this->processes->kill($process->pid(), Signal::terminate());
     }
 }

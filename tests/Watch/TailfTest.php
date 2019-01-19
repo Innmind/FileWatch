@@ -9,7 +9,11 @@ use Innmind\FileWatch\{
     Ping\ProcessOutput,
 };
 use Innmind\Url\Path;
-use Innmind\Server\Control\Server\Processes;
+use Innmind\Server\Control\Server\{
+    Processes,
+    Process,
+    Process\ExitCode,
+};
 use PHPUnit\Framework\TestCase;
 
 class TailfTest extends TestCase
@@ -36,7 +40,12 @@ class TailfTest extends TestCase
             ->method('execute')
             ->with($this->callback(static function($command): bool {
                 return (string) $command === "tail '-f' '/path/to/some/file'";
-            }));
+            }))
+            ->willReturn($process = $this->createMock(Process::class));
+        $process
+            ->expects($this->once())
+            ->method('exitCode')
+            ->willReturn(new ExitCode(0));
 
         $ping(function(){});
     }
