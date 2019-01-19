@@ -154,4 +154,50 @@ class ProcessOutputTest extends TestCase
             throw new \Exception('watev');
         });
     }
+
+    public function testDoesntTryToKillProcessWhenPingThrowsAnExceptionButProcessAlreadyFinished()
+    {
+        $ping = new ProcessOutput(
+            $processes = $this->createMock(Processes::class),
+            $command = Command::foreground('watch')
+        );
+        $process = new class implements Process {
+            public function pid(): Pid
+            {
+                return new Pid(42);
+            }
+
+            public function output(): Output
+            {
+                return new Output\StaticOutput(
+                    Map::of(Str::class, Output\Type::class)
+                        (Str::of(''), Output\Type::output()) // simulate one output
+                );
+            }
+
+            public function exitCode(): ExitCode
+            {}
+            public function wait(): Process {}
+            public function isRunning(): bool
+            {
+                return false;
+            }
+        };
+
+        $processes
+            ->expects($this->once())
+            ->method('execute')
+            ->with($command)
+            ->willReturn($process);
+        $processes
+            ->expects($this->never())
+            ->method('kill');
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('watev');
+
+        $ping(static function() {
+            throw new \Exception('watev');
+        });
+    }
 }
