@@ -39,7 +39,7 @@ class TailfTest extends TestCase
             ->expects($this->once())
             ->method('execute')
             ->with($this->callback(static function($command): bool {
-                return (string) $command === "tail '-f' '/path/to/some/file'";
+                return (string) $command === "[ -f /path/to/some/file ] && tail '-f' '/path/to/some/file'";
             }))
             ->willReturn($process = $this->createMock(Process::class));
         $process
