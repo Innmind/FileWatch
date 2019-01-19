@@ -48,20 +48,20 @@ class OutputDiffTest extends TestCase
             $period = $this->createMock(PeriodInterface::class)
         );
         $processes
-            ->expects($this->exactly(2))
+            ->expects($this->exactly(3))
             ->method('execute')
             ->with($command)
             ->willReturn($process = $this->createMock(Process::class));
         $process
-            ->expects($this->exactly(2))
+            ->expects($this->exactly(3))
             ->method('wait')
             ->will($this->returnSelf());
         $process
-            ->expects($this->exactly(2))
+            ->expects($this->exactly(3))
             ->method('exitCode')
             ->willReturn(new ExitCode(0));
         $process
-            ->expects($this->exactly(2))
+            ->expects($this->exactly(3))
             ->method('output')
             ->willReturn($output = $this->createMock(Output::class));
         $output
@@ -72,16 +72,25 @@ class OutputDiffTest extends TestCase
             ->expects($this->at(1))
             ->method('__toString')
             ->willReturn('bar');
+        $output
+            ->expects($this->at(2))
+            ->method('__toString')
+            ->willReturn('foo');
         $halt
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('__invoke')
             ->with($clock, $period);
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('to end test');
 
-        $ping(static function() {
-            throw new \Exception('to end test');
+        $count = 0;
+        $ping(static function() use (&$count) {
+            ++$count;
+
+            if ($count >= 2) {
+                throw new \Exception('to end test');
+            }
         });
     }
 
