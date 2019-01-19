@@ -16,7 +16,8 @@
     },
     "require": {
         "php": "~7.2",
-        "innmind/url": "^2.0"
+        "innmind/url": "^2.0",
+        "innmind/server-control": "^2.7"
     },
     "autoload": {
         "psr-4": {
