@@ -18,7 +18,7 @@
         "php": "~7.2",
         "innmind/url": "^2.0",
         "innmind/server-control": "^2.7",
-        "innmind/operating-system": "^1.3",
+        "innmind/operating-system": "^1.4",
         "innmind/time-warp": "^1.0"
     },
     "autoload": {
