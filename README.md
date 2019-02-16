@@ -19,10 +19,9 @@ composer require innmind/file-watch
 ```php
 use function Innmind\FileWatch\bootstrap;
 use Innmind\OperatingSystem\Factory;
-use Innmind\TimWarp\Halt\Usleep;
 use Innmind\Url\Path;
 
-$watch = bootstrap(Factory::build(), new Usleep);
+$watch = bootstrap(Factory::build());
 
 $watch(new Path('/to/some/file/or/folder'))(function(): void {
     // this function is called every time the file is modified

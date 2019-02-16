@@ -15,11 +15,8 @@ use Innmind\Server\Control\Server\{
     Process\Output,
     Process\ExitCode,
 };
-use Innmind\TimeWarp\Halt;
-use Innmind\TimeContinuum\{
-    TimeContinuumInterface,
-    PeriodInterface,
-};
+use Innmind\OperatingSystem\CurrentProcess;
+use Innmind\TimeContinuum\PeriodInterface;
 use PHPUnit\Framework\TestCase;
 
 class OutputDiffTest extends TestCase
@@ -31,8 +28,7 @@ class OutputDiffTest extends TestCase
             new OutputDiff(
                 $this->createMock(Processes::class),
                 Command::foreground('watev'),
-                $this->createMock(Halt::class),
-                $this->createMock(TimeContinuumInterface::class),
+                $this->createMock(CurrentProcess::class),
                 $this->createMock(PeriodInterface::class)
             )
         );
@@ -43,8 +39,7 @@ class OutputDiffTest extends TestCase
         $ping = new OutputDiff(
             $processes = $this->createMock(Processes::class),
             $command = Command::foreground('watev'),
-            $halt = $this->createMock(Halt::class),
-            $clock = $this->createMock(TimeContinuumInterface::class),
+            $currentProcess = $this->createMock(CurrentProcess::class),
             $period = $this->createMock(PeriodInterface::class)
         );
         $processes
@@ -76,10 +71,10 @@ class OutputDiffTest extends TestCase
             ->expects($this->at(2))
             ->method('__toString')
             ->willReturn('foo');
-        $halt
+        $currentProcess
             ->expects($this->exactly(2))
-            ->method('__invoke')
-            ->with($clock, $period);
+            ->method('halt')
+            ->with($period);
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('to end test');
@@ -99,8 +94,7 @@ class OutputDiffTest extends TestCase
         $ping = new OutputDiff(
             $processes = $this->createMock(Processes::class),
             $command = Command::foreground('watev'),
-            $halt = $this->createMock(Halt::class),
-            $this->createMock(TimeContinuumInterface::class),
+            $currentProcess = $this->createMock(CurrentProcess::class),
             $this->createMock(PeriodInterface::class)
         );
         $processes
@@ -119,9 +113,9 @@ class OutputDiffTest extends TestCase
         $process
             ->expects($this->never())
             ->method('output');
-        $halt
+        $currentProcess
             ->expects($this->never())
-            ->method('__invoke');
+            ->method('halt');
 
         $this->expectException(WatchFailed::class);
         $this->expectExceptionMessage('watev');
