@@ -35,8 +35,18 @@ final class Stat implements Watch
     {
         return new Ping\OutputDiff(
             $this->processes,
-            Command::foreground('stat')
-                ->withArgument((string) $file),
+            Command::foreground('find')
+                ->withArgument((string) $file)
+                ->withShortOption('type')
+                ->withArgument('f')
+                ->pipe(
+                    Command::foreground('xargs')
+                        ->withArgument('stat')
+                        ->withShortOption('f')
+                        ->withArgument('%Sm %N')
+                        ->withShortOption('t')
+                        ->withArgument('%Y-%m-%dT%H-%M-%S')
+                ),
             $this->process,
             $this->period
         );
