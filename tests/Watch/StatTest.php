@@ -48,7 +48,7 @@ class StatTest extends TestCase
             ->expects($this->exactly(2))
             ->method('execute')
             ->with($this->callback(static function($command): bool {
-                return (string) $command === "stat '/path/to/some/file'";
+                return (string) $command === "find '/path/to/some/file' '-type' 'f' | 'xargs' 'stat' '-f' '%Sm %N' '-t' '%Y-%m-%dT%H-%M-%S'";
             }))
             ->willReturn($process = $this->createMock(Process::class));
         $process
