@@ -7,7 +7,7 @@ use Innmind\FileWatch\{
     Watch,
     Ping,
 };
-use Innmind\Url\PathInterface;
+use Innmind\Url\Path;
 
 final class Fallback implements Watch
 {
@@ -20,7 +20,7 @@ final class Fallback implements Watch
         $this->fallback = $fallback;
     }
 
-    public function __invoke(PathInterface $file): Ping
+    public function __invoke(Path $file): Ping
     {
         return new Ping\Fallback(
             ($this->attempt)($file),

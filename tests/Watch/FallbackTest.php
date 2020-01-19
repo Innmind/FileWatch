@@ -9,7 +9,7 @@ use Innmind\FileWatch\{
     Ping,
     Exception\WatchFailed,
 };
-use Innmind\Url\PathInterface;
+use Innmind\Url\Path;
 use PHPUnit\Framework\TestCase;
 
 class FallbackTest extends TestCase
@@ -31,7 +31,7 @@ class FallbackTest extends TestCase
             $attempt = $this->createMock(Watch::class),
             $fallback = $this->createMock(Watch::class)
         );
-        $file = $this->createMock(PathInterface::class);
+        $file = Path::none();
         $attempt
             ->expects($this->once())
             ->method('__invoke')

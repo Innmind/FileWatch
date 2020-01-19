@@ -7,7 +7,7 @@ use Innmind\FileWatch\{
     Watch,
     Ping,
 };
-use Innmind\Url\PathInterface;
+use Innmind\Url\Path;
 use Innmind\Server\Control\Server\{
     Processes,
     Command,
@@ -22,13 +22,13 @@ final class Tailf implements Watch
         $this->processes = $processes;
     }
 
-    public function __invoke(PathInterface $file): Ping
+    public function __invoke(Path $file): Ping
     {
         return new Ping\ProcessOutput(
             $this->processes,
-            Command::foreground("[ -f $file ] && tail")
+            Command::foreground("[ -f {$file->toString()} ] && tail")
                 ->withShortOption('f')
-                ->withArgument((string) $file),
+                ->withArgument($file->toString()),
         );
     }
 }

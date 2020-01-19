@@ -17,8 +17,8 @@ use Innmind\Server\Control\Server\{
 };
 use Innmind\TimeWarp\Halt;
 use Innmind\TimeContinuum\{
-    TimeContinuumInterface,
-    PeriodInterface,
+    Clock,
+    Period,
 };
 use PHPUnit\Framework\TestCase;
 
@@ -31,8 +31,8 @@ class StatTest extends TestCase
             new Stat(
                 $this->createMock(Processes::class),
                 $this->createMock(Halt::class),
-                $this->createMock(TimeContinuumInterface::class),
-                $this->createMock(PeriodInterface::class)
+                $this->createMock(Clock::class),
+                $this->createMock(Period::class)
             )
         );
     }
@@ -42,18 +42,18 @@ class StatTest extends TestCase
         $watch = new Stat(
             $processes = $this->createMock(Processes::class),
             $this->createMock(Halt::class),
-            $this->createMock(TimeContinuumInterface::class),
-            $this->createMock(PeriodInterface::class)
+            $this->createMock(Clock::class),
+            $this->createMock(Period::class)
         );
 
-        $ping = $watch(new Path('/path/to/some/file'));
+        $ping = $watch(Path::of('/path/to/some/file'));
 
         $this->assertInstanceOf(OutputDiff::class, $ping);
         $processes
             ->expects($this->exactly(2))
             ->method('execute')
             ->with($this->callback(static function($command): bool {
-                return (string) $command === "find '/path/to/some/file' '-type' 'f' | 'xargs' 'stat' '-f' '%Sm %N' '-t' '%Y-%m-%dT%H-%M-%S'";
+                return $command->toString() === "find '/path/to/some/file' '-type' 'f' | 'xargs' 'stat' '-f' '%Sm %N' '-t' '%Y-%m-%dT%H-%M-%S'";
             }))
             ->willReturn($process = $this->createMock(Process::class));
         $process
@@ -70,11 +70,11 @@ class StatTest extends TestCase
             ->willReturn($output = $this->createMock(Output::class));
         $output
             ->expects($this->at(0))
-            ->method('__toString')
+            ->method('toString')
             ->willReturn('foo');
         $output
             ->expects($this->at(1))
-            ->method('__toString')
+            ->method('toString')
             ->willReturn('bar');
 
         $this->expectException(\Exception::class);

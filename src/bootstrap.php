@@ -6,12 +6,12 @@ namespace Innmind\FileWatch;
 use Innmind\Server\Control\Server\Processes;
 use Innmind\TimeWarp\Halt;
 use Innmind\TimeContinuum\{
-    TimeContinuumInterface,
-    PeriodInterface,
-    Period\Earth\Second,
+    Clock,
+    Period,
+    Earth\Period\Second,
 };
 
-function bootstrap(Processes $processes, Halt $halt, TimeContinuumInterface $clock, PeriodInterface $period = null): Watch
+function bootstrap(Processes $processes, Halt $halt, Clock $clock, Period $period = null): Watch
 {
     return new Watch\Fallback(
         new Watch\Tailf($processes),

@@ -18,7 +18,7 @@ use Innmind\Server\Control\Server\{
     Process\Pid,
 };
 use Innmind\Immutable\{
-    Map,
+    Sequence,
     Str,
 };
 use PHPUnit\Framework\TestCase;
@@ -103,7 +103,7 @@ class ProcessOutputTest extends TestCase
             ->willReturn(new ExitCode(1));
 
         $this->expectException(WatchFailed::class);
-        $this->expectExceptionMessage((string) $command);
+        $this->expectExceptionMessage($command->toString());
 
         $ping(static function(){});
     }
@@ -122,15 +122,17 @@ class ProcessOutputTest extends TestCase
 
             public function output(): Output
             {
-                return new Output\StaticOutput(
-                    Map::of(Str::class, Output\Type::class)
-                        (Str::of(''), Output\Type::output()) // simulate one output
+                return new Output\Output(
+                    Sequence::of(
+                        'array',
+                        [Str::of(''), Output\Type::output()], // simulate one output
+                    ),
                 );
             }
 
             public function exitCode(): ExitCode
             {}
-            public function wait(): Process {}
+            public function wait(): void {}
             public function isRunning(): bool
             {
                 return true;
@@ -169,15 +171,17 @@ class ProcessOutputTest extends TestCase
 
             public function output(): Output
             {
-                return new Output\StaticOutput(
-                    Map::of(Str::class, Output\Type::class)
-                        (Str::of(''), Output\Type::output()) // simulate one output
+                return new Output\Output(
+                    Sequence::of(
+                        'array',
+                        [Str::of(''), Output\Type::output()], // simulate one output
+                    ),
                 );
             }
 
             public function exitCode(): ExitCode
             {}
-            public function wait(): Process {}
+            public function wait(): void {}
             public function isRunning(): bool
             {
                 return false;

@@ -17,8 +17,8 @@ use Innmind\Server\Control\Server\{
 };
 use Innmind\TimeWarp\Halt;
 use Innmind\TimeContinuum\{
-    TimeContinuumInterface,
-    PeriodInterface,
+    Clock,
+    Period,
 };
 use PHPUnit\Framework\TestCase;
 
@@ -32,8 +32,8 @@ class OutputDiffTest extends TestCase
                 $this->createMock(Processes::class),
                 Command::foreground('watev'),
                 $this->createMock(Halt::class),
-                $this->createMock(TimeContinuumInterface::class),
-                $this->createMock(PeriodInterface::class)
+                $this->createMock(Clock::class),
+                $this->createMock(Period::class)
             )
         );
     }
@@ -44,8 +44,8 @@ class OutputDiffTest extends TestCase
             $processes = $this->createMock(Processes::class),
             $command = Command::foreground('watev'),
             $halt = $this->createMock(Halt::class),
-            $clock = $this->createMock(TimeContinuumInterface::class),
-            $period = $this->createMock(PeriodInterface::class)
+            $clock = $this->createMock(Clock::class),
+            $period = $this->createMock(Period::class)
         );
         $processes
             ->expects($this->exactly(3))
@@ -66,15 +66,15 @@ class OutputDiffTest extends TestCase
             ->willReturn($output = $this->createMock(Output::class));
         $output
             ->expects($this->at(0))
-            ->method('__toString')
+            ->method('toString')
             ->willReturn('foo');
         $output
             ->expects($this->at(1))
-            ->method('__toString')
+            ->method('toString')
             ->willReturn('bar');
         $output
             ->expects($this->at(2))
-            ->method('__toString')
+            ->method('toString')
             ->willReturn('foo');
         $halt
             ->expects($this->exactly(2))
@@ -100,8 +100,8 @@ class OutputDiffTest extends TestCase
             $processes = $this->createMock(Processes::class),
             $command = Command::foreground('watev'),
             $halt = $this->createMock(Halt::class),
-            $this->createMock(TimeContinuumInterface::class),
-            $this->createMock(PeriodInterface::class),
+            $this->createMock(Clock::class),
+            $this->createMock(Period::class),
         );
         $processes
             ->expects($this->once())

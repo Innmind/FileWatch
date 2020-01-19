@@ -14,8 +14,8 @@ use Innmind\Server\Control\Server\{
 };
 use Innmind\TimeWarp\Halt;
 use Innmind\TimeContinuum\{
-    TimeContinuumInterface,
-    PeriodInterface,
+    Clock,
+    Period,
 };
 
 final class OutputDiff implements Ping
@@ -23,15 +23,15 @@ final class OutputDiff implements Ping
     private Processes $processes;
     private Command $command;
     private Halt $halt;
-    private TimeContinuumInterface $clock;
-    private PeriodInterface $period;
+    private Clock $clock;
+    private Period $period;
 
     public function __construct(
         Processes $processes,
         Command $command,
         Halt $halt,
-        TimeContinuumInterface $clock,
-        PeriodInterface $period
+        Clock $clock,
+        Period $period
     ) {
         $this->processes = $processes;
         $this->command = $command;
@@ -58,13 +58,11 @@ final class OutputDiff implements Ping
 
     private function output(): Output
     {
-        $process = $this
-            ->processes
-            ->execute($this->command)
-            ->wait();
+        $process = $this->processes->execute($this->command);
+        $process->wait();
 
         if (!$process->exitCode()->isSuccessful()) {
-            throw new WatchFailed((string) $this->command);
+            throw new WatchFailed($this->command->toString());
         }
 
         return $process->output();
@@ -72,6 +70,6 @@ final class OutputDiff implements Ping
 
     private function diff(Output $previous, Output $now): bool
     {
-        return (string) $previous !== (string) $now;
+        return $previous->toString() !== $now->toString();
     }
 }
