@@ -16,8 +16,8 @@ use Innmind\Server\Control\Server\{
 
 final class ProcessOutput implements Ping
 {
-    private $processes;
-    private $command;
+    private Processes $processes;
+    private Command $command;
 
     public function __construct(Processes $processes, Command $command)
     {
@@ -37,7 +37,7 @@ final class ProcessOutput implements Ping
                 });
 
             if (!$process->exitCode()->isSuccessful()) {
-                throw new WatchFailed((string) $this->command);
+                throw new WatchFailed($this->command->toString());
             }
         } catch (WatchFailed $e) {
             throw $e;

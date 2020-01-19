@@ -12,25 +12,31 @@ use Innmind\Server\Control\Server\{
     Command,
     Process\Output,
 };
-use Innmind\OperatingSystem\CurrentProcess;
-use Innmind\TimeContinuum\PeriodInterface;
+use Innmind\TimeWarp\Halt;
+use Innmind\TimeContinuum\{
+    Clock,
+    Period,
+};
 
 final class OutputDiff implements Ping
 {
-    private $processes;
-    private $command;
-    private $process;
-    private $period;
+    private Processes $processes;
+    private Command $command;
+    private Halt $halt;
+    private Clock $clock;
+    private Period $period;
 
     public function __construct(
         Processes $processes,
         Command $command,
-        CurrentProcess $process,
-        PeriodInterface $period
+        Halt $halt,
+        Clock $clock,
+        Period $period
     ) {
         $this->processes = $processes;
         $this->command = $command;
-        $this->process = $process;
+        $this->halt = $halt;
+        $this->clock = $clock;
         $this->period = $period;
     }
 
@@ -39,7 +45,7 @@ final class OutputDiff implements Ping
         $previous = $this->output();
 
         do {
-            $this->process->halt($this->period);
+            ($this->halt)($this->clock, $this->period);
             $output = $this->output();
 
             if ($this->diff($previous, $output)) {
@@ -52,13 +58,11 @@ final class OutputDiff implements Ping
 
     private function output(): Output
     {
-        $process = $this
-            ->processes
-            ->execute($this->command)
-            ->wait();
+        $process = $this->processes->execute($this->command);
+        $process->wait();
 
         if (!$process->exitCode()->isSuccessful()) {
-            throw new WatchFailed((string) $this->command);
+            throw new WatchFailed($this->command->toString());
         }
 
         return $process->output();
@@ -66,6 +70,6 @@ final class OutputDiff implements Ping
 
     private function diff(Output $previous, Output $now): bool
     {
-        return (string) $previous !== (string) $now;
+        return $previous->toString() !== $now->toString();
     }
 }

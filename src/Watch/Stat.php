@@ -7,36 +7,42 @@ use Innmind\FileWatch\{
     Watch,
     Ping,
 };
-use Innmind\Url\PathInterface;
+use Innmind\Url\Path;
 use Innmind\Server\Control\Server\{
     Processes,
     Command,
 };
-use Innmind\OperatingSystem\CurrentProcess;
-use Innmind\TimeContinuum\PeriodInterface;
+use Innmind\TimeWarp\Halt;
+use Innmind\TimeContinuum\{
+    Clock,
+    Period,
+};
 
 final class Stat implements Watch
 {
-    private $processes;
-    private $process;
-    private $period;
+    private Processes $processes;
+    private Halt $halt;
+    private Clock $clock;
+    private Period $period;
 
     public function __construct(
         Processes $processes,
-        CurrentProcess $process,
-        PeriodInterface $period
+        Halt $halt,
+        Clock $clock,
+        Period $period
     ) {
         $this->processes = $processes;
-        $this->process = $process;
+        $this->halt = $halt;
+        $this->clock = $clock;
         $this->period = $period;
     }
 
-    public function __invoke(PathInterface $file): Ping
+    public function __invoke(Path $file): Ping
     {
         return new Ping\OutputDiff(
             $this->processes,
             Command::foreground('find')
-                ->withArgument((string) $file)
+                ->withArgument($file->toString())
                 ->withShortOption('type')
                 ->withArgument('f')
                 ->pipe(
@@ -45,10 +51,11 @@ final class Stat implements Watch
                         ->withShortOption('f')
                         ->withArgument('%Sm %N')
                         ->withShortOption('t')
-                        ->withArgument('%Y-%m-%dT%H-%M-%S')
+                        ->withArgument('%Y-%m-%dT%H-%M-%S'),
                 ),
-            $this->process,
-            $this->period
+            $this->halt,
+            $this->clock,
+            $this->period,
         );
     }
 }

@@ -2,9 +2,8 @@
 
 | `develop` |
 |-----------|
-| [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Innmind/FileWatch/badges/quality-score.png?b=develop)](https://scrutinizer-ci.com/g/Innmind/FileWatch/?branch=develop) |
-| [![Code Coverage](https://scrutinizer-ci.com/g/Innmind/FileWatch/badges/coverage.png?b=develop)](https://scrutinizer-ci.com/g/Innmind/FileWatch/?branch=develop) |
-| [![Build Status](https://scrutinizer-ci.com/g/Innmind/FileWatch/badges/build.png?b=develop)](https://scrutinizer-ci.com/g/Innmind/FileWatch/build-status/develop) |
+| [![codecov](https://codecov.io/gh/Innmind/FileWatch/branch/develop/graph/badge.svg)](https://codecov.io/gh/Innmind/FileWatch) |
+| [![Build Status](https://github.com/Innmind/FileWatch/workflows/CI/badge.svg)](https://github.com/Innmind/FileWatch/actions?query=workflow%3ACI) |
 
 Small tool to execute code every time a file (or folder) is modified.
 
@@ -18,10 +17,16 @@ composer require innmind/file-watch
 
 ```php
 use function Innmind\FileWatch\bootstrap;
-use Innmind\OperatingSystem\Factory;
+use Innmind\Server\Control\ServerFactory;
+use Innmind\TimeWarp\Halt\Usleep;
+use Innmind\RimeContinuum\Earth\Clock;
 use Innmind\Url\Path;
 
-$watch = bootstrap(Factory::build());
+$watch = bootstrap(
+    ServerFactory::build()->processes(),
+    new Usleep,
+    new Clock,
+);
 
 $watch(new Path('/to/some/file/or/folder'))(function(): void {
     // this function is called every time the file is modified

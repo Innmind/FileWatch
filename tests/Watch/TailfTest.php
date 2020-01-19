@@ -32,14 +32,14 @@ class TailfTest extends TestCase
             $processes = $this->createMock(Processes::class)
         );
 
-        $ping = $watch(new Path('/path/to/some/file'));
+        $ping = $watch(Path::of('/path/to/some/file'));
 
         $this->assertInstanceOf(ProcessOutput::class, $ping);
         $processes
             ->expects($this->once())
             ->method('execute')
             ->with($this->callback(static function($command): bool {
-                return (string) $command === "[ -f /path/to/some/file ] && tail '-f' '/path/to/some/file'";
+                return $command->toString() === "[ -f /path/to/some/file ] && tail '-f' '/path/to/some/file'";
             }))
             ->willReturn($process = $this->createMock(Process::class));
         $process
