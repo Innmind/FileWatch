@@ -11,8 +11,8 @@ use Innmind\Url\PathInterface;
 
 final class Fallback implements Watch
 {
-    private $attempt;
-    private $fallback;
+    private Watch $attempt;
+    private Watch $fallback;
 
     public function __construct(Watch $attempt, Watch $fallback)
     {
@@ -24,7 +24,7 @@ final class Fallback implements Watch
     {
         return new Ping\Fallback(
             ($this->attempt)($file),
-            ($this->fallback)($file)
+            ($this->fallback)($file),
         );
     }
 }

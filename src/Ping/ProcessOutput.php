@@ -16,8 +16,8 @@ use Innmind\Server\Control\Server\{
 
 final class ProcessOutput implements Ping
 {
-    private $processes;
-    private $command;
+    private Processes $processes;
+    private Command $command;
 
     public function __construct(Processes $processes, Command $command)
     {

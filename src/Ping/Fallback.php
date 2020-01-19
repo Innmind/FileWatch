@@ -10,8 +10,8 @@ use Innmind\FileWatch\{
 
 final class Fallback implements Ping
 {
-    private $attempt;
-    private $fallback;
+    private Ping $attempt;
+    private Ping $fallback;
 
     public function __construct(Ping $attempt, Ping $fallback)
     {

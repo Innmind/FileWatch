@@ -19,7 +19,7 @@ function bootstrap(Processes $processes, Halt $halt, TimeContinuumInterface $clo
             $processes,
             $halt,
             $clock,
-            $period ?? new Second(1)
-        )
+            $period ?? new Second(1),
+        ),
     );
 }

@@ -20,11 +20,11 @@ use Innmind\TimeContinuum\{
 
 final class OutputDiff implements Ping
 {
-    private $processes;
-    private $command;
-    private $halt;
-    private $clock;
-    private $period;
+    private Processes $processes;
+    private Command $command;
+    private Halt $halt;
+    private TimeContinuumInterface $clock;
+    private PeriodInterface $period;
 
     public function __construct(
         Processes $processes,

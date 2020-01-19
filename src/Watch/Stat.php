@@ -20,10 +20,10 @@ use Innmind\TimeContinuum\{
 
 final class Stat implements Watch
 {
-    private $processes;
-    private $halt;
-    private $clock;
-    private $period;
+    private Processes $processes;
+    private Halt $halt;
+    private TimeContinuumInterface $clock;
+    private PeriodInterface $period;
 
     public function __construct(
         Processes $processes,
@@ -51,11 +51,11 @@ final class Stat implements Watch
                         ->withShortOption('f')
                         ->withArgument('%Sm %N')
                         ->withShortOption('t')
-                        ->withArgument('%Y-%m-%dT%H-%M-%S')
+                        ->withArgument('%Y-%m-%dT%H-%M-%S'),
                 ),
             $this->halt,
             $this->clock,
-            $this->period
+            $this->period,
         );
     }
 }

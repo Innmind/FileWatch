@@ -15,7 +15,7 @@ use Innmind\Server\Control\Server\{
 
 final class Tailf implements Watch
 {
-    private $processes;
+    private Processes $processes;
 
     public function __construct(Processes $processes)
     {
@@ -28,7 +28,7 @@ final class Tailf implements Watch
             $this->processes,
             Command::foreground("[ -f $file ] && tail")
                 ->withShortOption('f')
-                ->withArgument((string) $file)
+                ->withArgument((string) $file),
         );
     }
 }
