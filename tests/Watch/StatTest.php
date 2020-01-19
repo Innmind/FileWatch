@@ -15,8 +15,11 @@ use Innmind\Server\Control\Server\{
     Process\ExitCode,
     Process\Output,
 };
-use Innmind\OperatingSystem\CurrentProcess;
-use Innmind\TimeContinuum\PeriodInterface;
+use Innmind\TimeWarp\Halt;
+use Innmind\TimeContinuum\{
+    TimeContinuumInterface,
+    PeriodInterface,
+};
 use PHPUnit\Framework\TestCase;
 
 class StatTest extends TestCase
@@ -27,7 +30,8 @@ class StatTest extends TestCase
             Watch::class,
             new Stat(
                 $this->createMock(Processes::class),
-                $this->createMock(CurrentProcess::class),
+                $this->createMock(Halt::class),
+                $this->createMock(TimeContinuumInterface::class),
                 $this->createMock(PeriodInterface::class)
             )
         );
@@ -37,7 +41,8 @@ class StatTest extends TestCase
     {
         $watch = new Stat(
             $processes = $this->createMock(Processes::class),
-            $this->createMock(CurrentProcess::class),
+            $this->createMock(Halt::class),
+            $this->createMock(TimeContinuumInterface::class),
             $this->createMock(PeriodInterface::class)
         );
 

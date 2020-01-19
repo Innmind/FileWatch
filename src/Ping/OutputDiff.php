@@ -12,25 +12,31 @@ use Innmind\Server\Control\Server\{
     Command,
     Process\Output,
 };
-use Innmind\OperatingSystem\CurrentProcess;
-use Innmind\TimeContinuum\PeriodInterface;
+use Innmind\TimeWarp\Halt;
+use Innmind\TimeContinuum\{
+    TimeContinuumInterface,
+    PeriodInterface,
+};
 
 final class OutputDiff implements Ping
 {
     private $processes;
     private $command;
-    private $process;
+    private $halt;
+    private $clock;
     private $period;
 
     public function __construct(
         Processes $processes,
         Command $command,
-        CurrentProcess $process,
+        Halt $halt,
+        TimeContinuumInterface $clock,
         PeriodInterface $period
     ) {
         $this->processes = $processes;
         $this->command = $command;
-        $this->process = $process;
+        $this->halt = $halt;
+        $this->clock = $clock;
         $this->period = $period;
     }
 
@@ -39,7 +45,7 @@ final class OutputDiff implements Ping
         $previous = $this->output();
 
         do {
-            $this->process->halt($this->period);
+            ($this->halt)($this->clock, $this->period);
             $output = $this->output();
 
             if ($this->diff($previous, $output)) {
