@@ -17,10 +17,16 @@ composer require innmind/file-watch
 
 ```php
 use function Innmind\FileWatch\bootstrap;
-use Innmind\OperatingSystem\Factory;
+use Innmind\Server\Control\ServerFactory;
+use Innmind\TimeWarp\Halt\Usleep;
+use Innmind\RimeContinuum\Earth\Clock;
 use Innmind\Url\Path;
 
-$watch = bootstrap(Factory::build());
+$watch = bootstrap(
+    ServerFactory::build()->processes(),
+    new Usleep,
+    new Clock,
+);
 
 $watch(new Path('/to/some/file/or/folder'))(function(): void {
     // this function is called every time the file is modified
