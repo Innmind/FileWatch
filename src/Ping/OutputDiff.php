@@ -61,7 +61,7 @@ final class OutputDiff implements Ping
         $process = $this->processes->execute($this->command);
         $process->wait();
 
-        if (!$process->exitCode()->isSuccessful()) {
+        if (!$process->exitCode()->successful()) {
             throw new WatchFailed($this->command->toString());
         }
 
