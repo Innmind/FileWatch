@@ -47,35 +47,59 @@ class OutputDiffTest extends TestCase
             $clock = $this->createMock(Clock::class),
             $period = $this->createMock(Period::class)
         );
+        $process1 = $this->createMock(Process::class);
+        $process1
+            ->expects($this->once())
+            ->method('wait');
+        $process1
+            ->expects($this->any())
+            ->method('exitCode')
+            ->willReturn(new ExitCode(0));
+        $process1
+            ->expects($this->once())
+            ->method('output')
+            ->willReturn($output1 = $this->createMock(Output::class));
+        $output1
+            ->expects($this->any())
+            ->method('toString')
+            ->willReturn('foo');
+        $process2 = $this->createMock(Process::class);
+        $process2
+            ->expects($this->once())
+            ->method('wait');
+        $process2
+            ->expects($this->any())
+            ->method('exitCode')
+            ->willReturn(new ExitCode(0));
+        $process2
+            ->expects($this->once())
+            ->method('output')
+            ->willReturn($output2 = $this->createMock(Output::class));
+        $output2
+            ->expects($this->any())
+            ->method('toString')
+            ->willReturn('bar');
+        $process3 = $this->createMock(Process::class);
+        $process3
+            ->expects($this->once())
+            ->method('wait');
+        $process3
+            ->expects($this->any())
+            ->method('exitCode')
+            ->willReturn(new ExitCode(0));
+        $process3
+            ->expects($this->once())
+            ->method('output')
+            ->willReturn($output3 = $this->createMock(Output::class));
+        $output3
+            ->expects($this->any())
+            ->method('toString')
+            ->willReturn('foo');
         $processes
             ->expects($this->exactly(3))
             ->method('execute')
             ->with($command)
-            ->willReturn($process = $this->createMock(Process::class));
-        $process
-            ->expects($this->exactly(3))
-            ->method('wait')
-            ->will($this->returnSelf());
-        $process
-            ->expects($this->exactly(3))
-            ->method('exitCode')
-            ->willReturn(new ExitCode(0));
-        $process
-            ->expects($this->exactly(3))
-            ->method('output')
-            ->willReturn($output = $this->createMock(Output::class));
-        $output
-            ->expects($this->at(0))
-            ->method('toString')
-            ->willReturn('foo');
-        $output
-            ->expects($this->at(1))
-            ->method('toString')
-            ->willReturn('bar');
-        $output
-            ->expects($this->at(2))
-            ->method('toString')
-            ->willReturn('foo');
+            ->will($this->onConsecutiveCalls($process1, $process2, $process3));
         $halt
             ->expects($this->exactly(2))
             ->method('__invoke')
@@ -126,6 +150,6 @@ class OutputDiffTest extends TestCase
         $this->expectException(WatchFailed::class);
         $this->expectExceptionMessage('watev');
 
-        $ping(static function(){});
+        $ping(static function() {});
     }
 }

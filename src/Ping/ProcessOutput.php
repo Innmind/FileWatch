@@ -36,7 +36,7 @@ final class ProcessOutput implements Ping
                     $ping();
                 });
 
-            if (!$process->exitCode()->isSuccessful()) {
+            if (!$process->exitCode()->successful()) {
                 throw new WatchFailed($this->command->toString());
             }
         } catch (WatchFailed $e) {

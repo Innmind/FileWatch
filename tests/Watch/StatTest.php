@@ -69,18 +69,14 @@ class StatTest extends TestCase
             ->method('output')
             ->willReturn($output = $this->createMock(Output::class));
         $output
-            ->expects($this->at(0))
+            ->expects($this->exactly(2))
             ->method('toString')
-            ->willReturn('foo');
-        $output
-            ->expects($this->at(1))
-            ->method('toString')
-            ->willReturn('bar');
+            ->will($this->onConsecutiveCalls('foo', 'bar'));
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('to end test');
 
-        $ping(function(){
+        $ping(static function() {
             throw new \Exception('to end test');
         });
     }

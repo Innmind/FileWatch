@@ -53,6 +53,6 @@ class FallbackTest extends TestCase
         $ping = $watch($file);
 
         $this->assertInstanceOf(Ping\Fallback::class, $ping);
-        $this->assertNull($ping(function(){}));
+        $this->assertNull($ping(static function() {}));
     }
 }

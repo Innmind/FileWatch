@@ -36,7 +36,7 @@ class FallbackTest extends TestCase
             ->expects($this->never())
             ->method('__invoke');
 
-        $this->assertNull($ping(function(){}));
+        $this->assertNull($ping(static function() {}));
     }
 
     public function testUseFallbackWhenFirstStrategyFails()
@@ -53,7 +53,7 @@ class FallbackTest extends TestCase
             ->expects($this->once())
             ->method('__invoke');
 
-        $this->assertNull($ping(function(){}));
+        $this->assertNull($ping(static function() {}));
     }
 
     public function testDoesntCatchFallbackException()
@@ -73,6 +73,6 @@ class FallbackTest extends TestCase
 
         $this->expectException(WatchFailed::class);
 
-        $ping(function(){});
+        $ping(static function() {});
     }
 }

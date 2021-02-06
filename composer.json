@@ -15,7 +15,7 @@
         "issues": "http://github.com/Innmind/FileWatch/issues"
     },
     "require": {
-        "php": "~7.4",
+        "php": "~7.4|~8.0",
         "innmind/url": "~3.0",
         "innmind/server-control": "~3.0",
         "innmind/time-warp": "~2.0",
@@ -33,7 +33,8 @@
         }
     },
     "require-dev": {
-        "phpunit/phpunit": "~8.0",
-        "vimeo/psalm": "~3.7.0"
+        "phpunit/phpunit": "~9.0",
+        "vimeo/psalm": "~4.1",
+        "innmind/coding-standard": "^1.1"
     }
 }
