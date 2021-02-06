@@ -150,6 +150,6 @@ class OutputDiffTest extends TestCase
         $this->expectException(WatchFailed::class);
         $this->expectExceptionMessage('watev');
 
-        $ping(static function(){});
+        $ping(static function() {});
     }
 }

@@ -76,7 +76,7 @@ class StatTest extends TestCase
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('to end test');
 
-        $ping(function(){
+        $ping(static function() {
             throw new \Exception('to end test');
         });
     }

@@ -105,7 +105,7 @@ class ProcessOutputTest extends TestCase
         $this->expectException(WatchFailed::class);
         $this->expectExceptionMessage($command->toString());
 
-        $ping(static function(){});
+        $ping(static function() {});
     }
 
     public function testKillProcessWhenPingThrowsAnException()
@@ -131,8 +131,11 @@ class ProcessOutputTest extends TestCase
             }
 
             public function exitCode(): ExitCode
-            {}
-            public function wait(): void {}
+            {
+            }
+            public function wait(): void
+            {
+            }
             public function isRunning(): bool
             {
                 return true;
@@ -180,8 +183,11 @@ class ProcessOutputTest extends TestCase
             }
 
             public function exitCode(): ExitCode
-            {}
-            public function wait(): void {}
+            {
+            }
+            public function wait(): void
+            {
+            }
             public function isRunning(): bool
             {
                 return false;

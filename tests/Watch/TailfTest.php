@@ -47,6 +47,6 @@ class TailfTest extends TestCase
             ->method('exitCode')
             ->willReturn(new ExitCode(0));
 
-        $ping(function(){});
+        $ping(static function() {});
     }
 }
