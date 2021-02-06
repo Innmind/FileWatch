@@ -1,9 +1,8 @@
 # FileWatch
 
-| `develop` |
-|-----------|
-| [![codecov](https://codecov.io/gh/Innmind/FileWatch/branch/develop/graph/badge.svg)](https://codecov.io/gh/Innmind/FileWatch) |
-| [![Build Status](https://github.com/Innmind/FileWatch/workflows/CI/badge.svg)](https://github.com/Innmind/FileWatch/actions?query=workflow%3ACI) |
+[![Build Status](https://github.com/innmind/filewatch/workflows/CI/badge.svg?branch=master)](https://github.com/innmind/filewatch/actions?query=workflow%3ACI)
+[![codecov](https://codecov.io/gh/innmind/filewatch/branch/develop/graph/badge.svg)](https://codecov.io/gh/innmind/filewatch)
+[![Type Coverage](https://shepherd.dev/github/innmind/filewatch/coverage.svg)](https://shepherd.dev/github/innmind/filewatch)
 
 Small tool to execute code every time a file (or folder) is modified.
 
