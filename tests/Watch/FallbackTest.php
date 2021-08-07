@@ -10,6 +10,10 @@ use Innmind\FileWatch\{
     Exception\WatchFailed,
 };
 use Innmind\Url\Path;
+use Innmind\Immutable\{
+    Either,
+    SideEffect,
+};
 use PHPUnit\Framework\TestCase;
 
 class FallbackTest extends TestCase
@@ -40,7 +44,7 @@ class FallbackTest extends TestCase
         $attemptPing
             ->expects($this->once())
             ->method('__invoke')
-            ->will($this->throwException(new WatchFailed));
+            ->willReturn(Either::left(new WatchFailed));
         $fallback
             ->expects($this->once())
             ->method('__invoke')
@@ -48,11 +52,12 @@ class FallbackTest extends TestCase
             ->willReturn($fallbackPing = $this->createMock(Ping::class));
         $fallbackPing
             ->expects($this->once())
-            ->method('__invoke');
+            ->method('__invoke')
+            ->willReturn($expected = Either::right(new SideEffect));
 
         $ping = $watch($file);
 
         $this->assertInstanceOf(Ping\Fallback::class, $ping);
-        $this->assertNull($ping(static function() {}));
+        $this->assertSame($expected, $ping(static function() {}));
     }
 }

@@ -70,13 +70,19 @@ class ProcessOutputTest extends TestCase
             ->willReturn(Either::right(new SideEffect));
 
         $called = false;
-        $this->assertNull($ping(static function() use (&$called): void {
-            $called = true;
-        }));
+        $this->assertInstanceOf(
+            SideEffect::class,
+            $ping(static function() use (&$called): void {
+                $called = true;
+            })->match(
+                static fn() => null,
+                static fn($sideEffect) => $sideEffect,
+            ),
+        );
         $this->assertTrue($called);
     }
 
-    public function testThrowWhenProcessFails()
+    public function testReturnErrorWhenProcessFails()
     {
         $ping = new ProcessOutput(
             $processes = $this->createMock(Processes::class),
@@ -108,10 +114,12 @@ class ProcessOutputTest extends TestCase
             ->method('wait')
             ->willReturn(Either::left(new ProcessFailed(new ExitCode(1))));
 
-        $this->expectException(WatchFailed::class);
-        $this->expectExceptionMessage($command->toString());
-
-        $ping(static function() {});
+        $error = $ping(static function() {})->match(
+            static fn($e) => $e,
+            static fn() => null,
+        );
+        $this->assertInstanceOf(WatchFailed::class, $error);
+        $this->assertSame($command->toString(), $error->getMessage());
     }
 
     public function testKillProcessWhenPingThrowsAnException()

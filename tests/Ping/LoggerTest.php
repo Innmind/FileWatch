@@ -8,6 +8,10 @@ use Innmind\FileWatch\{
     Ping,
 };
 use Innmind\Url\Path;
+use Innmind\Immutable\{
+    Either,
+    SideEffect,
+};
 use Psr\Log\LoggerInterface;
 use PHPUnit\Framework\TestCase;
 use Innmind\BlackBox\PHPUnit\BlackBox;
@@ -43,7 +47,8 @@ class LoggerTest extends TestCase
                         $ping();
 
                         return true;
-                    }));
+                    }))
+                    ->willReturn($expected = Either::right(new SideEffect));
                 $logger = $this->createMock(LoggerInterface::class);
                 $logger
                     ->expects($this->exactly(3))
@@ -65,7 +70,7 @@ class LoggerTest extends TestCase
                 $ping = new Logger($inner, $path, $logger);
                 $count = 0;
 
-                $this->assertNull($ping(static function() use (&$count) {
+                $this->assertSame($expected, $ping(static function() use (&$count) {
                     $count++;
                 }));
                 $this->assertSame(2, $count);

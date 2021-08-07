@@ -8,6 +8,10 @@ use Innmind\FileWatch\{
     Ping,
     Exception\WatchFailed,
 };
+use Innmind\Immutable\{
+    Either,
+    SideEffect,
+};
 use PHPUnit\Framework\TestCase;
 
 class FallbackTest extends TestCase
@@ -31,12 +35,13 @@ class FallbackTest extends TestCase
         );
         $attempt
             ->expects($this->once())
-            ->method('__invoke');
+            ->method('__invoke')
+            ->willReturn($expected = Either::right(new SideEffect));
         $fallback
             ->expects($this->never())
             ->method('__invoke');
 
-        $this->assertNull($ping(static function() {}));
+        $this->assertEquals($expected, $ping(static function() {}));
     }
 
     public function testUseFallbackWhenFirstStrategyFails()
@@ -48,15 +53,16 @@ class FallbackTest extends TestCase
         $attempt
             ->expects($this->once())
             ->method('__invoke')
-            ->will($this->throwException(new WatchFailed));
+            ->willReturn(Either::left(new WatchFailed));
         $fallback
             ->expects($this->once())
-            ->method('__invoke');
+            ->method('__invoke')
+            ->willReturn($expected = Either::right(new SideEffect));
 
-        $this->assertNull($ping(static function() {}));
+        $this->assertSame($expected, $ping(static function() {}));
     }
 
-    public function testDoesntCatchFallbackException()
+    public function testReturnFallbackError()
     {
         $ping = new Fallback(
             $attempt = $this->createMock(Ping::class),
@@ -65,14 +71,12 @@ class FallbackTest extends TestCase
         $attempt
             ->expects($this->once())
             ->method('__invoke')
-            ->will($this->throwException(new WatchFailed));
+            ->willReturn(Either::left(new WatchFailed));
         $fallback
             ->expects($this->once())
             ->method('__invoke')
-            ->will($this->throwException(new WatchFailed));
+            ->willReturn($expected = Either::left(new WatchFailed));
 
-        $this->expectException(WatchFailed::class);
-
-        $ping(static function() {});
+        $this->assertSame($expected, $ping(static function() {}));
     }
 }

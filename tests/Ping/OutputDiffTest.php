@@ -109,7 +109,7 @@ class OutputDiffTest extends TestCase
         });
     }
 
-    public function testThrowWhenTheProcessFails()
+    public function testReturnErrorWhenTheProcessFails()
     {
         $ping = new OutputDiff(
             $processes = $this->createMock(Processes::class),
@@ -130,12 +130,14 @@ class OutputDiffTest extends TestCase
             ->expects($this->never())
             ->method('output');
         $halt
-            ->expects($this->never())
+            ->expects($this->once())
             ->method('__invoke');
 
-        $this->expectException(WatchFailed::class);
-        $this->expectExceptionMessage('watev');
-
-        $ping(static function() {});
+        $error = $ping(static function() {})->match(
+            static fn($e) => $e,
+            static fn() => null,
+        );
+        $this->assertInstanceOf(WatchFailed::class, $error);
+        $this->assertSame('watev', $error->getMessage());
     }
 }

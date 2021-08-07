@@ -3,10 +3,8 @@ declare(strict_types = 1);
 
 namespace Innmind\FileWatch\Ping;
 
-use Innmind\FileWatch\{
-    Ping,
-    Exception\WatchFailed,
-};
+use Innmind\FileWatch\Ping;
+use Innmind\Immutable\Either;
 
 final class Fallback implements Ping
 {
@@ -19,12 +17,10 @@ final class Fallback implements Ping
         $this->fallback = $fallback;
     }
 
-    public function __invoke(callable $ping): void
+    public function __invoke(callable $ping): Either
     {
-        try {
-            ($this->attempt)($ping);
-        } catch (WatchFailed $e) {
-            ($this->fallback)($ping);
-        }
+        return ($this->attempt)($ping)->otherwise(
+            fn() => ($this->fallback)($ping),
+        );
     }
 }

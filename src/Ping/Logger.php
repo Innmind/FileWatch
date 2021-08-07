@@ -5,6 +5,7 @@ namespace Innmind\FileWatch\Ping;
 
 use Innmind\FileWatch\Ping;
 use Innmind\Url\Path;
+use Innmind\Immutable\Either;
 use Psr\Log\LoggerInterface;
 
 final class Logger implements Ping
@@ -23,14 +24,14 @@ final class Logger implements Ping
         $this->logger = $logger;
     }
 
-    public function __invoke(callable $ping): void
+    public function __invoke(callable $ping): Either
     {
         $this->logger->info(
             'Starting to watch {path}',
             ['path' => $this->path->toString()],
         );
 
-        ($this->ping)(function() use ($ping): void {
+        return ($this->ping)(function() use ($ping): void {
             $this->logger->info(
                 'Content at {path} changed',
                 ['path' => $this->path->toString()],

@@ -13,6 +13,7 @@ use Innmind\Server\Control\Server\{
     Process,
     Signal,
 };
+use Innmind\Immutable\Either;
 
 final class ProcessOutput implements Ping
 {
@@ -25,7 +26,7 @@ final class ProcessOutput implements Ping
         $this->command = $command;
     }
 
-    public function __invoke(callable $ping): void
+    public function __invoke(callable $ping): Either
     {
         $process = $this->processes->execute($this->command);
 
@@ -35,16 +36,10 @@ final class ProcessOutput implements Ping
                 ->foreach(static function() use ($ping): void {
                     $ping();
                 });
-            $throwOnError = $process
+
+            return $process
                 ->wait()
-                ->leftMap(fn() => new WatchFailed($this->command->toString()))
-                ->match(
-                    static fn($e) => static fn() => throw $e,
-                    static fn() => static fn() => null,
-                );
-            $throwOnError();
-        } catch (WatchFailed $e) {
-            throw $e;
+                ->leftMap(fn() => new WatchFailed($this->command->toString()));
         } catch (\Throwable $e) {
             $this->kill($process);
 

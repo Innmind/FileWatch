@@ -14,6 +14,10 @@ use Innmind\Server\Control\Server\{
 };
 use Innmind\TimeWarp\Halt;
 use Innmind\TimeContinuum\Period;
+use Innmind\Immutable\{
+    Either,
+    SideEffect,
+};
 
 final class OutputDiff implements Ping
 {
@@ -34,35 +38,41 @@ final class OutputDiff implements Ping
         $this->period = $period;
     }
 
-    public function __invoke(callable $ping): void
+    public function __invoke(callable $ping): Either
     {
         $previous = $this->output();
 
         do {
             ($this->halt)($this->period);
-            $output = $this->output();
+            $previous = $previous->flatMap(
+                fn($previous) => $this->output()->map(function($output) use ($previous, $ping) {
+                    if ($this->diff($previous, $output)) {
+                        $ping();
+                    }
 
-            if ($this->diff($previous, $output)) {
-                $ping();
-            }
+                    return $output;
+                }),
+            );
+            $continue = $previous->match(
+                static fn() => false,
+                static fn() => true,
+            );
+        } while ($continue);
 
-            $previous = $output;
-        } while (true);
+        return $previous->map(static fn() => new SideEffect);
     }
 
-    private function output(): Output
+    /**
+     * @return Either<WatchFailed, Output>
+     */
+    private function output(): Either
     {
         $process = $this->processes->execute($this->command);
-        $throwOnError = $process
+
+        return $process
             ->wait()
             ->leftMap(fn() => new WatchFailed($this->command->toString()))
-            ->match(
-                static fn($e) => static fn() => throw $e,
-                static fn() => static fn() => null,
-            );
-        $throwOnError();
-
-        return $process->output();
+            ->map(static fn() => $process->output());
     }
 
     private function diff(Output $previous, Output $now): bool
