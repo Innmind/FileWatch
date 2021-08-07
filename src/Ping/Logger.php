@@ -17,7 +17,7 @@ final class Logger implements Ping
     public function __construct(
         Ping $ping,
         Path $path,
-        LoggerInterface $logger
+        LoggerInterface $logger,
     ) {
         $this->ping = $ping;
         $this->path = $path;

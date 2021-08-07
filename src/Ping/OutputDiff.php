@@ -30,7 +30,7 @@ final class OutputDiff implements Ping
         Processes $processes,
         Command $command,
         Halt $halt,
-        Period $period
+        Period $period,
     ) {
         $this->processes = $processes;
         $this->command = $command;

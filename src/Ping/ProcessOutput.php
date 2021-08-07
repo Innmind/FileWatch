@@ -31,11 +31,7 @@ final class ProcessOutput implements Ping
         $process = $this->processes->execute($this->command);
 
         try {
-            $_ = $process
-                ->output()
-                ->foreach(static function() use ($ping): void {
-                    $ping();
-                });
+            $_ = $process->output()->foreach($ping);
 
             return $process
                 ->wait()

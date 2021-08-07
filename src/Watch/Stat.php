@@ -24,7 +24,7 @@ final class Stat implements Watch
     public function __construct(
         Processes $processes,
         Halt $halt,
-        Period $period
+        Period $period,
     ) {
         $this->processes = $processes;
         $this->halt = $halt;
