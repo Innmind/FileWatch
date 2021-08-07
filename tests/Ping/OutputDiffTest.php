@@ -17,10 +17,7 @@ use Innmind\Server\Control\{
     Exception\ProcessFailed,
 };
 use Innmind\TimeWarp\Halt;
-use Innmind\TimeContinuum\{
-    Clock,
-    Period,
-};
+use Innmind\TimeContinuum\Period;
 use Innmind\Immutable\{
     Either,
     SideEffect,
@@ -37,7 +34,6 @@ class OutputDiffTest extends TestCase
                 $this->createMock(Processes::class),
                 Command::foreground('watev'),
                 $this->createMock(Halt::class),
-                $this->createMock(Clock::class),
                 $this->createMock(Period::class)
             )
         );
@@ -49,7 +45,6 @@ class OutputDiffTest extends TestCase
             $processes = $this->createMock(Processes::class),
             $command = Command::foreground('watev'),
             $halt = $this->createMock(Halt::class),
-            $clock = $this->createMock(Clock::class),
             $period = $this->createMock(Period::class)
         );
         $process1 = $this->createMock(Process::class);
@@ -120,7 +115,6 @@ class OutputDiffTest extends TestCase
             $processes = $this->createMock(Processes::class),
             $command = Command::foreground('watev'),
             $halt = $this->createMock(Halt::class),
-            $this->createMock(Clock::class),
             $this->createMock(Period::class),
         );
         $processes

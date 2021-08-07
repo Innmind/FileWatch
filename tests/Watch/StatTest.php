@@ -16,10 +16,7 @@ use Innmind\Server\Control\Server\{
     Process\Output,
 };
 use Innmind\TimeWarp\Halt;
-use Innmind\TimeContinuum\{
-    Clock,
-    Period,
-};
+use Innmind\TimeContinuum\Period;
 use Innmind\Immutable\{
     Either,
     SideEffect,
@@ -35,7 +32,6 @@ class StatTest extends TestCase
             new Stat(
                 $this->createMock(Processes::class),
                 $this->createMock(Halt::class),
-                $this->createMock(Clock::class),
                 $this->createMock(Period::class)
             )
         );
@@ -46,7 +42,6 @@ class StatTest extends TestCase
         $watch = new Stat(
             $processes = $this->createMock(Processes::class),
             $this->createMock(Halt::class),
-            $this->createMock(Clock::class),
             $this->createMock(Period::class)
         );
 

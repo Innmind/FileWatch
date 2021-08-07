@@ -13,27 +13,21 @@ use Innmind\Server\Control\Server\{
     Command,
 };
 use Innmind\TimeWarp\Halt;
-use Innmind\TimeContinuum\{
-    Clock,
-    Period,
-};
+use Innmind\TimeContinuum\Period;
 
 final class Stat implements Watch
 {
     private Processes $processes;
     private Halt $halt;
-    private Clock $clock;
     private Period $period;
 
     public function __construct(
         Processes $processes,
         Halt $halt,
-        Clock $clock,
         Period $period
     ) {
         $this->processes = $processes;
         $this->halt = $halt;
-        $this->clock = $clock;
         $this->period = $period;
     }
 
@@ -54,7 +48,6 @@ final class Stat implements Watch
                         ->withArgument('%Y-%m-%dT%H-%M-%S'),
                 ),
             $this->halt,
-            $this->clock,
             $this->period,
         );
     }

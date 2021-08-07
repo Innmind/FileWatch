@@ -7,7 +7,6 @@ use function Innmind\FileWatch\bootstrap;
 use Innmind\FileWatch\Watch;
 use Innmind\Server\Control\Server\Processes;
 use Innmind\TimeWarp\Halt;
-use Innmind\TimeContinuum\Clock;
 use PHPUnit\Framework\TestCase;
 
 class BootstrapTest extends TestCase
@@ -17,7 +16,6 @@ class BootstrapTest extends TestCase
         $watch = bootstrap(
             $this->createMock(Processes::class),
             $this->createMock(Halt::class),
-            $this->createMock(Clock::class)
         );
 
         $this->assertInstanceOf(Watch::class, $watch);

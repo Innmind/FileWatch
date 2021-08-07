@@ -13,10 +13,7 @@ use Innmind\Server\Control\Server\{
     Process\Output,
 };
 use Innmind\TimeWarp\Halt;
-use Innmind\TimeContinuum\{
-    Clock,
-    Period,
-};
+use Innmind\TimeContinuum\Period;
 
 final class OutputDiff implements Ping
 {
@@ -29,7 +26,6 @@ final class OutputDiff implements Ping
         Processes $processes,
         Command $command,
         Halt $halt,
-        Clock $clock,
         Period $period
     ) {
         $this->processes = $processes;
