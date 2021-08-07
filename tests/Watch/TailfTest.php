@@ -12,7 +12,12 @@ use Innmind\Url\Path;
 use Innmind\Server\Control\Server\{
     Processes,
     Process,
-    Process\ExitCode,
+    Process\Output\Output,
+};
+use Innmind\Immutable\{
+    Either,
+    SideEffect,
+    Sequence,
 };
 use PHPUnit\Framework\TestCase;
 
@@ -44,8 +49,11 @@ class TailfTest extends TestCase
             ->willReturn($process = $this->createMock(Process::class));
         $process
             ->expects($this->once())
-            ->method('exitCode')
-            ->willReturn(new ExitCode(0));
+            ->method('wait')
+            ->willReturn(Either::right(new SideEffect));
+        $process
+            ->method('output')
+            ->willReturn(new Output(Sequence::of()));
 
         $ping(static function() {});
     }

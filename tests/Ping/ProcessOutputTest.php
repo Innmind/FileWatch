@@ -8,18 +8,22 @@ use Innmind\FileWatch\{
     Ping,
     Exception\WatchFailed,
 };
-use Innmind\Server\Control\Server\{
-    Processes,
-    Command,
-    Signal,
-    Process,
-    Process\Output,
-    Process\ExitCode,
-    Process\Pid,
+use Innmind\Server\Control\{
+    Server\Processes,
+    Server\Command,
+    Server\Signal,
+    Server\Process,
+    Server\Process\Output,
+    Server\Process\ExitCode,
+    Server\Process\Pid,
+    Exception\ProcessFailed,
 };
 use Innmind\Immutable\{
     Sequence,
     Str,
+    Either,
+    Maybe,
+    SideEffect,
 };
 use PHPUnit\Framework\TestCase;
 
@@ -58,11 +62,12 @@ class ProcessOutputTest extends TestCase
                 $callable(); //simulate one output
 
                 return true;
-            }));
+            }))
+            ->willReturn(new SideEffect);
         $process
             ->expects($this->once())
-            ->method('exitCode')
-            ->willReturn(new ExitCode(0));
+            ->method('wait')
+            ->willReturn(Either::right(new SideEffect));
 
         $called = false;
         $this->assertNull($ping(static function() use (&$called): void {
@@ -96,11 +101,12 @@ class ProcessOutputTest extends TestCase
                 $callable(); //simulate one output
 
                 return true;
-            }));
+            }))
+            ->willReturn(new SideEffect);
         $process
             ->expects($this->once())
-            ->method('exitCode')
-            ->willReturn(new ExitCode(1));
+            ->method('wait')
+            ->willReturn(Either::left(new ProcessFailed(new ExitCode(1))));
 
         $this->expectException(WatchFailed::class);
         $this->expectExceptionMessage($command->toString());
@@ -115,16 +121,15 @@ class ProcessOutputTest extends TestCase
             $command = Command::foreground('watch')
         );
         $process = new class implements Process {
-            public function pid(): Pid
+            public function pid(): Maybe
             {
-                return new Pid(42);
+                return Maybe::just(new Pid(42));
             }
 
             public function output(): Output
             {
                 return new Output\Output(
                     Sequence::of(
-                        'array',
                         [Str::of(''), Output\Type::output()], // simulate one output
                     ),
                 );
@@ -133,12 +138,9 @@ class ProcessOutputTest extends TestCase
             public function exitCode(): ExitCode
             {
             }
-            public function wait(): void
+            public function wait(): Either
             {
-            }
-            public function isRunning(): bool
-            {
-                return true;
+                return Either::right(new SideEffect);
             }
         };
 
@@ -150,7 +152,8 @@ class ProcessOutputTest extends TestCase
         $processes
             ->expects($this->once())
             ->method('kill')
-            ->with($process->pid(), Signal::terminate());
+            ->with(new Pid(42), Signal::terminate())
+            ->willReturn(Either::right(new SideEffect));
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('watev');
@@ -167,30 +170,23 @@ class ProcessOutputTest extends TestCase
             $command = Command::foreground('watch')
         );
         $process = new class implements Process {
-            public function pid(): Pid
+            public function pid(): Maybe
             {
-                return new Pid(42);
+                return Maybe::nothing();
             }
 
             public function output(): Output
             {
                 return new Output\Output(
                     Sequence::of(
-                        'array',
                         [Str::of(''), Output\Type::output()], // simulate one output
                     ),
                 );
             }
 
-            public function exitCode(): ExitCode
+            public function wait(): Either
             {
-            }
-            public function wait(): void
-            {
-            }
-            public function isRunning(): bool
-            {
-                return false;
+                return Either::right(new SideEffect);
             }
         };
 

@@ -8,17 +8,22 @@ use Innmind\FileWatch\{
     Ping,
     Exception\WatchFailed,
 };
-use Innmind\Server\Control\Server\{
-    Processes,
-    Command,
-    Process,
-    Process\Output,
-    Process\ExitCode,
+use Innmind\Server\Control\{
+    Server\Processes,
+    Server\Command,
+    Server\Process,
+    Server\Process\Output,
+    Server\Process\ExitCode,
+    Exception\ProcessFailed,
 };
 use Innmind\TimeWarp\Halt;
 use Innmind\TimeContinuum\{
     Clock,
     Period,
+};
+use Innmind\Immutable\{
+    Either,
+    SideEffect,
 };
 use PHPUnit\Framework\TestCase;
 
@@ -50,11 +55,8 @@ class OutputDiffTest extends TestCase
         $process1 = $this->createMock(Process::class);
         $process1
             ->expects($this->once())
-            ->method('wait');
-        $process1
-            ->expects($this->any())
-            ->method('exitCode')
-            ->willReturn(new ExitCode(0));
+            ->method('wait')
+            ->willReturn(Either::right(new SideEffect));
         $process1
             ->expects($this->once())
             ->method('output')
@@ -66,11 +68,8 @@ class OutputDiffTest extends TestCase
         $process2 = $this->createMock(Process::class);
         $process2
             ->expects($this->once())
-            ->method('wait');
-        $process2
-            ->expects($this->any())
-            ->method('exitCode')
-            ->willReturn(new ExitCode(0));
+            ->method('wait')
+            ->willReturn(Either::right(new SideEffect));
         $process2
             ->expects($this->once())
             ->method('output')
@@ -82,11 +81,8 @@ class OutputDiffTest extends TestCase
         $process3 = $this->createMock(Process::class);
         $process3
             ->expects($this->once())
-            ->method('wait');
-        $process3
-            ->expects($this->any())
-            ->method('exitCode')
-            ->willReturn(new ExitCode(0));
+            ->method('wait')
+            ->willReturn(Either::right(new SideEffect));
         $process3
             ->expects($this->once())
             ->method('output')
@@ -103,7 +99,7 @@ class OutputDiffTest extends TestCase
         $halt
             ->expects($this->exactly(2))
             ->method('__invoke')
-            ->with($clock, $period);
+            ->with($period);
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('to end test');
@@ -135,11 +131,7 @@ class OutputDiffTest extends TestCase
         $process
             ->expects($this->once())
             ->method('wait')
-            ->will($this->returnSelf());
-        $process
-            ->expects($this->once())
-            ->method('exitCode')
-            ->willReturn(new ExitCode(1));
+            ->willReturn(Either::left(new ProcessFailed(new ExitCode(1))));
         $process
             ->expects($this->never())
             ->method('output');

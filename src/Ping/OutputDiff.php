@@ -23,7 +23,6 @@ final class OutputDiff implements Ping
     private Processes $processes;
     private Command $command;
     private Halt $halt;
-    private Clock $clock;
     private Period $period;
 
     public function __construct(
@@ -36,7 +35,6 @@ final class OutputDiff implements Ping
         $this->processes = $processes;
         $this->command = $command;
         $this->halt = $halt;
-        $this->clock = $clock;
         $this->period = $period;
     }
 
@@ -45,7 +43,7 @@ final class OutputDiff implements Ping
         $previous = $this->output();
 
         do {
-            ($this->halt)($this->clock, $this->period);
+            ($this->halt)($this->period);
             $output = $this->output();
 
             if ($this->diff($previous, $output)) {
@@ -59,11 +57,14 @@ final class OutputDiff implements Ping
     private function output(): Output
     {
         $process = $this->processes->execute($this->command);
-        $process->wait();
-
-        if (!$process->exitCode()->successful()) {
-            throw new WatchFailed($this->command->toString());
-        }
+        $throwOnError = $process
+            ->wait()
+            ->leftMap(fn() => new WatchFailed($this->command->toString()))
+            ->match(
+                static fn($e) => static fn() => throw $e,
+                static fn() => static fn() => null,
+            );
+        $throwOnError();
 
         return $process->output();
     }

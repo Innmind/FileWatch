@@ -30,15 +30,19 @@ final class ProcessOutput implements Ping
         $process = $this->processes->execute($this->command);
 
         try {
-            $process
+            $_ = $process
                 ->output()
                 ->foreach(static function() use ($ping): void {
                     $ping();
                 });
-
-            if (!$process->exitCode()->successful()) {
-                throw new WatchFailed($this->command->toString());
-            }
+            $throwOnError = $process
+                ->wait()
+                ->leftMap(fn() => new WatchFailed($this->command->toString()))
+                ->match(
+                    static fn($e) => static fn() => throw $e,
+                    static fn() => static fn() => null,
+                );
+            $throwOnError();
         } catch (WatchFailed $e) {
             throw $e;
         } catch (\Throwable $e) {
@@ -50,10 +54,9 @@ final class ProcessOutput implements Ping
 
     private function kill(Process $process): void
     {
-        if (!$process->isRunning()) {
-            return;
-        }
-
-        $this->processes->kill($process->pid(), Signal::terminate());
+        $_ = $process->pid()->match(
+            fn($pid) => $this->processes->kill($pid, Signal::terminate()),
+            static fn() => null,
+        );
     }
 }

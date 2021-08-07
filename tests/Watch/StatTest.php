@@ -20,6 +20,10 @@ use Innmind\TimeContinuum\{
     Clock,
     Period,
 };
+use Innmind\Immutable\{
+    Either,
+    SideEffect,
+};
 use PHPUnit\Framework\TestCase;
 
 class StatTest extends TestCase
@@ -58,12 +62,8 @@ class StatTest extends TestCase
             ->willReturn($process = $this->createMock(Process::class));
         $process
             ->expects($this->exactly(2))
-            ->method('exitCode')
-            ->willReturn(new ExitCode(0));
-        $process
-            ->expects($this->exactly(2))
             ->method('wait')
-            ->will($this->returnSelf());
+            ->willReturn(Either::right(new SideEffect));
         $process
             ->expects($this->exactly(2))
             ->method('output')
