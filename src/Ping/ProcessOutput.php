@@ -46,7 +46,7 @@ final class ProcessOutput implements Ping
     private function kill(Process $process): void
     {
         $_ = $process->pid()->match(
-            fn($pid) => $this->processes->kill($pid, Signal::terminate()),
+            fn($pid) => $this->processes->kill($pid, Signal::terminate),
             static fn() => null,
         );
     }

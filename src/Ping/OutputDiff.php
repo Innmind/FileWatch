@@ -54,8 +54,8 @@ final class OutputDiff implements Ping
                 }),
             );
             $continue = $previous->match(
-                static fn() => false,
                 static fn() => true,
+                static fn() => false,
             );
         } while ($continue);
 

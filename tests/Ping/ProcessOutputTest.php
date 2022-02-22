@@ -16,7 +16,6 @@ use Innmind\Server\Control\{
     Server\Process\Output,
     Server\Process\ExitCode,
     Server\Process\Pid,
-    Exception\ProcessFailed,
 };
 use Innmind\Immutable\{
     Sequence,
@@ -75,8 +74,8 @@ class ProcessOutputTest extends TestCase
             $ping(static function() use (&$called): void {
                 $called = true;
             })->match(
-                static fn() => null,
                 static fn($sideEffect) => $sideEffect,
+                static fn() => null,
             ),
         );
         $this->assertTrue($called);
@@ -112,11 +111,11 @@ class ProcessOutputTest extends TestCase
         $process
             ->expects($this->once())
             ->method('wait')
-            ->willReturn(Either::left(new ProcessFailed(new ExitCode(1))));
+            ->willReturn(Either::left(new Process\Failed(new ExitCode(1))));
 
         $error = $ping(static function() {})->match(
-            static fn($e) => $e,
             static fn() => null,
+            static fn($e) => $e,
         );
         $this->assertInstanceOf(WatchFailed::class, $error);
         $this->assertSame($command->toString(), $error->getMessage());
@@ -138,14 +137,11 @@ class ProcessOutputTest extends TestCase
             {
                 return new Output\Output(
                     Sequence::of(
-                        [Str::of(''), Output\Type::output()], // simulate one output
+                        [Str::of(''), Output\Type::output], // simulate one output
                     ),
                 );
             }
 
-            public function exitCode(): ExitCode
-            {
-            }
             public function wait(): Either
             {
                 return Either::right(new SideEffect);
@@ -160,7 +156,7 @@ class ProcessOutputTest extends TestCase
         $processes
             ->expects($this->once())
             ->method('kill')
-            ->with(new Pid(42), Signal::terminate())
+            ->with(new Pid(42), Signal::terminate)
             ->willReturn(Either::right(new SideEffect));
 
         $this->expectException(\Exception::class);
@@ -187,7 +183,7 @@ class ProcessOutputTest extends TestCase
             {
                 return new Output\Output(
                     Sequence::of(
-                        [Str::of(''), Output\Type::output()], // simulate one output
+                        [Str::of(''), Output\Type::output], // simulate one output
                     ),
                 );
             }

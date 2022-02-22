@@ -14,7 +14,6 @@ use Innmind\Server\Control\{
     Server\Process,
     Server\Process\Output,
     Server\Process\ExitCode,
-    Exception\ProcessFailed,
 };
 use Innmind\TimeWarp\Halt;
 use Innmind\TimeContinuum\Period;
@@ -125,7 +124,7 @@ class OutputDiffTest extends TestCase
         $process
             ->expects($this->once())
             ->method('wait')
-            ->willReturn(Either::left(new ProcessFailed(new ExitCode(1))));
+            ->willReturn(Either::left(new Process\Failed(new ExitCode(1))));
         $process
             ->expects($this->never())
             ->method('output');
@@ -134,8 +133,8 @@ class OutputDiffTest extends TestCase
             ->method('__invoke');
 
         $error = $ping(static function() {})->match(
-            static fn($e) => $e,
             static fn() => null,
+            static fn($e) => $e,
         );
         $this->assertInstanceOf(WatchFailed::class, $error);
         $this->assertSame('watev', $error->getMessage());
