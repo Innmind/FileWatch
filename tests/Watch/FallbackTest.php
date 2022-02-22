@@ -24,8 +24,8 @@ class FallbackTest extends TestCase
             Watch::class,
             new Fallback(
                 $this->createMock(Watch::class),
-                $this->createMock(Watch::class)
-            )
+                $this->createMock(Watch::class),
+            ),
         );
     }
 
@@ -33,7 +33,7 @@ class FallbackTest extends TestCase
     {
         $watch = new Fallback(
             $attempt = $this->createMock(Watch::class),
-            $fallback = $this->createMock(Watch::class)
+            $fallback = $this->createMock(Watch::class),
         );
         $file = Path::none();
         $attempt

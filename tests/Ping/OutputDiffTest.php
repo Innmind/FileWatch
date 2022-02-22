@@ -33,8 +33,8 @@ class OutputDiffTest extends TestCase
                 $this->createMock(Processes::class),
                 Command::foreground('watev'),
                 $this->createMock(Halt::class),
-                $this->createMock(Period::class)
-            )
+                $this->createMock(Period::class),
+            ),
         );
     }
 
@@ -44,7 +44,7 @@ class OutputDiffTest extends TestCase
             $processes = $this->createMock(Processes::class),
             $command = Command::foreground('watev'),
             $halt = $this->createMock(Halt::class),
-            $period = $this->createMock(Period::class)
+            $period = $this->createMock(Period::class),
         );
         $process1 = $this->createMock(Process::class);
         $process1

@@ -27,14 +27,14 @@ class TailfTest extends TestCase
     {
         $this->assertInstanceOf(
             Watch::class,
-            new Tailf($this->createMock(Processes::class))
+            new Tailf($this->createMock(Processes::class)),
         );
     }
 
     public function testInvokation()
     {
         $watch = new Tailf(
-            $processes = $this->createMock(Processes::class)
+            $processes = $this->createMock(Processes::class),
         );
 
         $ping = $watch(Path::of('/path/to/some/file'));

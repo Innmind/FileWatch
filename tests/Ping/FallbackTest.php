@@ -22,8 +22,8 @@ class FallbackTest extends TestCase
             Ping::class,
             new Fallback(
                 $this->createMock(Ping::class),
-                $this->createMock(Ping::class)
-            )
+                $this->createMock(Ping::class),
+            ),
         );
     }
 
@@ -31,7 +31,7 @@ class FallbackTest extends TestCase
     {
         $ping = new Fallback(
             $attempt = $this->createMock(Ping::class),
-            $fallback = $this->createMock(Ping::class)
+            $fallback = $this->createMock(Ping::class),
         );
         $attempt
             ->expects($this->once())
@@ -48,7 +48,7 @@ class FallbackTest extends TestCase
     {
         $ping = new Fallback(
             $attempt = $this->createMock(Ping::class),
-            $fallback = $this->createMock(Ping::class)
+            $fallback = $this->createMock(Ping::class),
         );
         $attempt
             ->expects($this->once())
@@ -66,7 +66,7 @@ class FallbackTest extends TestCase
     {
         $ping = new Fallback(
             $attempt = $this->createMock(Ping::class),
-            $fallback = $this->createMock(Ping::class)
+            $fallback = $this->createMock(Ping::class),
         );
         $attempt
             ->expects($this->once())

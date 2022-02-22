@@ -32,8 +32,8 @@ class StatTest extends TestCase
             new Stat(
                 $this->createMock(Processes::class),
                 $this->createMock(Halt::class),
-                $this->createMock(Period::class)
-            )
+                $this->createMock(Period::class),
+            ),
         );
     }
 
@@ -42,7 +42,7 @@ class StatTest extends TestCase
         $watch = new Stat(
             $processes = $this->createMock(Processes::class),
             $this->createMock(Halt::class),
-            $this->createMock(Period::class)
+            $this->createMock(Period::class),
         );
 
         $ping = $watch(Path::of('/path/to/some/file'));

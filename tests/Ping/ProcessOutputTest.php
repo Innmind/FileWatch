@@ -34,8 +34,8 @@ class ProcessOutputTest extends TestCase
             Ping::class,
             new ProcessOutput(
                 $this->createMock(Processes::class),
-                Command::foreground('watev')
-            )
+                Command::foreground('watev'),
+            ),
         );
     }
 
@@ -43,7 +43,7 @@ class ProcessOutputTest extends TestCase
     {
         $ping = new ProcessOutput(
             $processes = $this->createMock(Processes::class),
-            $command = Command::foreground('watch')
+            $command = Command::foreground('watch'),
         );
         $processes
             ->expects($this->once())
@@ -85,7 +85,7 @@ class ProcessOutputTest extends TestCase
     {
         $ping = new ProcessOutput(
             $processes = $this->createMock(Processes::class),
-            $command = Command::foreground('watch')
+            $command = Command::foreground('watch'),
         );
         $processes
             ->expects($this->never())
@@ -125,7 +125,7 @@ class ProcessOutputTest extends TestCase
     {
         $ping = new ProcessOutput(
             $processes = $this->createMock(Processes::class),
-            $command = Command::foreground('watch')
+            $command = Command::foreground('watch'),
         );
         $process = new class implements Process {
             public function pid(): Maybe
@@ -171,7 +171,7 @@ class ProcessOutputTest extends TestCase
     {
         $ping = new ProcessOutput(
             $processes = $this->createMock(Processes::class),
-            $command = Command::foreground('watch')
+            $command = Command::foreground('watch'),
         );
         $process = new class implements Process {
             public function pid(): Maybe
