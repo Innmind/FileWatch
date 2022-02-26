@@ -3,8 +3,8 @@ declare(strict_types = 1);
 
 namespace Tests\Innmind\FileWatch;
 
-use function Innmind\FileWatch\bootstrap;
 use Innmind\FileWatch\{
+    Factory,
     Watch\Logger,
     Exception\WatchFailed,
     Stop,
@@ -36,7 +36,7 @@ class FunctionalTest extends TestCase
             'sleep 1 && echo foo >> /tmp/watch-file && sleep 1 && echo foo >> /tmp/watch-file',
         ));
 
-        $watch = bootstrap($processes, new Usleep);
+        $watch = Factory::build($processes, new Usleep);
 
         $either = $watch(Path::of('/tmp/watch-file'))(0, static function($count) {
             ++$count;
@@ -72,7 +72,7 @@ class FunctionalTest extends TestCase
             'sleep 1 && echo foo >> /tmp/watch-file && sleep 1 && echo foo >> /tmp/watch-file',
         ));
 
-        $watch = bootstrap($processes, new Usleep);
+        $watch = Factory::build($processes, new Usleep);
 
         $either = $watch(Path::of('/tmp/watch-file'))(0, static function($count) {
             ++$count;
@@ -108,7 +108,7 @@ class FunctionalTest extends TestCase
             'sleep 1 && touch /tmp/watch-file && sleep 1 && rm /tmp/watch-file',
         ));
 
-        $watch = bootstrap($processes, new Usleep);
+        $watch = Factory::build($processes, new Usleep);
 
         $either = $watch(Path::of('/tmp/'))(0, static function($count) {
             ++$count;
@@ -140,7 +140,7 @@ class FunctionalTest extends TestCase
             'sleep 1 && touch /tmp/watch-file && sleep 1 && rm /tmp/watch-file',
         ));
 
-        $watch = bootstrap($processes, new Usleep);
+        $watch = Factory::build($processes, new Usleep);
 
         $either = $watch(Path::of('/tmp/'))(0, static function($count) {
             ++$count;
@@ -171,7 +171,7 @@ class FunctionalTest extends TestCase
             new Usleep,
         );
 
-        $watch = bootstrap($processes, new Usleep);
+        $watch = Factory::build($processes, new Usleep);
 
         $either = $watch(Path::of('/unknown/'))(null, static fn() => null);
 
@@ -196,7 +196,7 @@ class FunctionalTest extends TestCase
             'sleep 1 && echo foo >> /tmp/watch-file && sleep 1 && echo foo >> /tmp/watch-file',
         ));
 
-        $inner = bootstrap($processes, new Usleep);
+        $inner = Factory::build($processes, new Usleep);
         $watch = Logger::psr($inner, $logger = $this->createMock(LoggerInterface::class));
         $logger
             ->expects($this->exactly(3))
