@@ -115,7 +115,7 @@ class FunctionalTest extends TestCase
 
         $watch = Factory::build($processes, new Usleep);
 
-        $either = $watch(Path::of('/tmp/'))(0, static function($count) {
+        $either = $watch(Path::of('/tmp/innmind/'))(0, static function($count) {
             ++$count;
 
             if ($count === 2) {
@@ -147,7 +147,7 @@ class FunctionalTest extends TestCase
 
         $watch = Factory::build($processes, new Usleep);
 
-        $either = $watch(Path::of('/tmp/'))(0, static function($count) {
+        $either = $watch(Path::of('/tmp/innmind/'))(0, static function($count) {
             ++$count;
 
             if ($count === 2) {
