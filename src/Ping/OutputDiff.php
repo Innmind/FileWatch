@@ -114,7 +114,7 @@ final class OutputDiff implements Ping
             ->output()
             ->filter(static fn($_, $type) => $type === Type::error)
             ->chunks();
-
+        dump($process->output()->toString());
         if (!$error->empty()) {
             return Either::left(new Failed);
         }
