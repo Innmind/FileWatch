@@ -197,7 +197,7 @@ class FunctionalTest extends TestCase
         ));
 
         $inner = bootstrap($processes, new Usleep);
-        $watch = new Logger($inner, $logger = $this->createMock(LoggerInterface::class));
+        $watch = Logger::psr($inner, $logger = $this->createMock(LoggerInterface::class));
         $logger
             ->expects($this->exactly(3))
             ->method('info')
