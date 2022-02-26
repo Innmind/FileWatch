@@ -35,10 +35,12 @@ final class Stat implements Watch
     {
         if (\PHP_OS === 'Linux') {
             $stat = Command::foreground('xargs')
+                ->withShortOption('n', '1')
                 ->withArgument('stat')
                 ->withOption('format', '%y %n');
         } else {
             $stat = Command::foreground('xargs')
+                ->withShortOption('n', '1')
                 ->withArgument('stat')
                 ->withShortOption('f')
                 ->withArgument('%Sm %N')
