@@ -11,6 +11,7 @@ use Innmind\Server\Control\Server\{
     Processes,
     Command,
     Process\Output,
+    Process\Output\Type,
 };
 use Innmind\TimeWarp\Halt;
 use Innmind\TimeContinuum\Period;
@@ -68,11 +69,16 @@ final class OutputDiff implements Ping
     private function output(): Either
     {
         $process = $this->processes->execute($this->command);
+        $error = $process
+            ->output()
+            ->filter(static fn($_, $type) => $type === Type::error)
+            ->chunks();
 
-        return $process
-            ->wait()
-            ->leftMap(fn() => new WatchFailed($this->command->toString()))
-            ->map(static fn() => $process->output());
+        if (!$error->empty()) {
+            return Either::left(new WatchFailed);
+        }
+
+        return Either::right($process->output());
     }
 
     private function diff(Output $previous, Output $now): bool
