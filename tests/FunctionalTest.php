@@ -23,22 +23,32 @@ use PHPUnit\Framework\TestCase;
 
 class FunctionalTest extends TestCase
 {
+    public function setUp(): void
+    {
+        @\unlink('/tmp/inmmind/watch-file');
+        @\mkdir('/tmp/innmind');
+    }
+
+    public function tearDown(): void
+    {
+        @\unlink('/tmp/inmmind/watch-file');
+    }
+
     public function testWatchFile()
     {
-        @\unlink('/tmp/watch-file');
-        \touch('/tmp/watch-file');
+        \touch('/tmp/innmind/watch-file');
         $processes = Unix::of(
             new Clock,
             Select::timeoutAfter(...),
             new Usleep,
         );
         $process = $processes->execute(Command::background(
-            'sleep 1 && echo foo >> /tmp/watch-file && sleep 1 && echo foo >> /tmp/watch-file && sleep 1 && echo foo >> /tmp/watch-file',
+            'sleep 1 && echo foo >> /tmp/innmind/watch-file && sleep 1 && echo foo >> /tmp/innmind/watch-file && sleep 1 && echo foo >> /tmp/innmind/watch-file',
         ));
 
         $watch = Factory::build($processes, new Usleep);
 
-        $either = $watch(Path::of('/tmp/watch-file'))(0, static function($count) {
+        $either = $watch(Path::of('/tmp/innmind/watch-file'))(0, static function($count) {
             ++$count;
 
             if ($count === 2) {
@@ -55,26 +65,23 @@ class FunctionalTest extends TestCase
                 static fn() => null,
             ),
         );
-
-        \unlink('/tmp/watch-file');
     }
 
     public function testWatchFileReturnError()
     {
-        @\unlink('/tmp/watch-file');
-        \touch('/tmp/watch-file');
+        \touch('/tmp/innmind/watch-file');
         $processes = Unix::of(
             new Clock,
             Select::timeoutAfter(...),
             new Usleep,
         );
         $process = $processes->execute(Command::background(
-            'sleep 1 && echo foo >> /tmp/watch-file && sleep 1 && echo foo >> /tmp/watch-file && sleep 1 && echo foo >> /tmp/watch-file',
+            'sleep 1 && echo foo >> /tmp/innmind/watch-file && sleep 1 && echo foo >> /tmp/innmind/watch-file && sleep 1 && echo foo >> /tmp/innmind/watch-file',
         ));
 
         $watch = Factory::build($processes, new Usleep);
 
-        $either = $watch(Path::of('/tmp/watch-file'))(0, static function($count) {
+        $either = $watch(Path::of('/tmp/innmind/watch-file'))(0, static function($count) {
             ++$count;
 
             if ($count === 2) {
@@ -93,8 +100,6 @@ class FunctionalTest extends TestCase
                 static fn($count) => $count,
             ),
         );
-
-        \unlink('/tmp/watch-file');
     }
 
     public function testWatchDirectory()
@@ -105,7 +110,7 @@ class FunctionalTest extends TestCase
             new Usleep,
         );
         $process = $processes->execute(Command::background(
-            'sleep 1 && touch /tmp/watch-file && sleep 1 && rm /tmp/watch-file',
+            'sleep 1 && touch /tmp/innmind/watch-file && sleep 1 && rm /tmp/innmind/watch-file',
         ));
 
         $watch = Factory::build($processes, new Usleep);
@@ -137,7 +142,7 @@ class FunctionalTest extends TestCase
             new Usleep,
         );
         $process = $processes->execute(Command::background(
-            'sleep 1 && touch /tmp/watch-file && sleep 1 && rm /tmp/watch-file',
+            'sleep 1 && touch /tmp/innmind/watch-file && sleep 1 && rm /tmp/innmind/watch-file',
         ));
 
         $watch = Factory::build($processes, new Usleep);
@@ -185,15 +190,14 @@ class FunctionalTest extends TestCase
     }
     public function testLog()
     {
-        @\unlink('/tmp/watch-file');
-        \touch('/tmp/watch-file');
+        \touch('/tmp/innmind/watch-file');
         $processes = Unix::of(
             new Clock,
             Select::timeoutAfter(...),
             new Usleep,
         );
         $process = $processes->execute(Command::background(
-            'sleep 1 && echo foo >> /tmp/watch-file && sleep 1 && echo foo >> /tmp/watch-file && sleep 1 && echo foo >> /tmp/watch-file',
+            'sleep 1 && echo foo >> /tmp/innmind/watch-file && sleep 1 && echo foo >> /tmp/innmind/watch-file && sleep 1 && echo foo >> /tmp/innmind/watch-file',
         ));
 
         $inner = Factory::build($processes, new Usleep);
@@ -204,19 +208,19 @@ class FunctionalTest extends TestCase
             ->withConsecutive(
                 [
                     'Starting to watch {path}',
-                    ['path' => '/tmp/watch-file'],
+                    ['path' => '/tmp/innmind/watch-file'],
                 ],
                 [
                     'Content at {path} changed',
-                    ['path' => '/tmp/watch-file'],
+                    ['path' => '/tmp/innmind/watch-file'],
                 ],
                 [
                     'Content at {path} changed',
-                    ['path' => '/tmp/watch-file'],
+                    ['path' => '/tmp/innmind/watch-file'],
                 ],
             );
 
-        $either = $watch(Path::of('/tmp/watch-file'))(0, static function($count) {
+        $either = $watch(Path::of('/tmp/innmind/watch-file'))(0, static function($count) {
             ++$count;
 
             if ($count === 2) {
@@ -233,7 +237,5 @@ class FunctionalTest extends TestCase
                 static fn() => null,
             ),
         );
-
-        \unlink('/tmp/watch-file');
     }
 }
