@@ -5,7 +5,7 @@ namespace Innmind\FileWatch\Ping;
 
 use Innmind\FileWatch\{
     Ping,
-    Exception\WatchFailed,
+    Failed,
     Stop,
 };
 use Innmind\Immutable\Either;
@@ -28,16 +28,16 @@ final class Fallback implements Ping
      * @param C $carry
      * @param callable(C): Either<L|Stop<C>, C> $ping
      *
-     * @return Either<WatchFailed|L, C>
+     * @return Either<Failed|L, C>
      */
     public function __invoke(mixed $carry, callable $ping): Either
     {
         /**
          * @psalm-suppress InvalidArgument
-         * @var Either<WatchFailed|L, C>
+         * @var Either<Failed|L, C>
          */
         return ($this->attempt)($carry, $ping)->otherwise(
-            fn($left) => match ($left instanceof WatchFailed) {
+            fn($left) => match ($left instanceof Failed) {
                 true => ($this->fallback)($carry, $ping),
                 false => Either::left($left),
             },

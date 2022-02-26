@@ -6,7 +6,7 @@ namespace Innmind\FileWatch\Ping;
 use Innmind\FileWatch\{
     Ping,
     Stop,
-    Exception\WatchFailed,
+    Failed,
 };
 use Innmind\Url\Path;
 use Innmind\Immutable\Either;
@@ -35,7 +35,7 @@ final class Logger implements Ping
      * @param C $carry
      * @param callable(C): Either<L|Stop<C>, C> $ping
      *
-     * @return Either<WatchFailed|L, C>
+     * @return Either<Failed|L, C>
      */
     public function __invoke(mixed $carry, callable $ping): Either
     {
@@ -44,7 +44,7 @@ final class Logger implements Ping
             ['path' => $this->path->toString()],
         );
 
-        /** @var Either<WatchFailed|L, C> */
+        /** @var Either<Failed|L, C> */
         return ($this->ping)($carry, function(mixed $carry) use ($ping): Either {
             /** @var C $carry */
             $this->logger->info(

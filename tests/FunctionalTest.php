@@ -6,7 +6,7 @@ namespace Tests\Innmind\FileWatch;
 use Innmind\FileWatch\{
     Factory,
     Watch\Logger,
-    Exception\WatchFailed,
+    Failed,
     Stop,
 };
 use Innmind\Server\Control\Server\{
@@ -176,7 +176,7 @@ class FunctionalTest extends TestCase
         $either = $watch(Path::of('/unknown/'))(null, static fn() => null);
 
         $this->assertInstanceOf(
-            WatchFailed::class,
+            Failed::class,
             $either->match(
                 static fn() => null,
                 static fn($e) => $e,

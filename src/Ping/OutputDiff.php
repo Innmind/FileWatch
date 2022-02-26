@@ -5,7 +5,7 @@ namespace Innmind\FileWatch\Ping;
 
 use Innmind\FileWatch\{
     Ping,
-    Exception\WatchFailed,
+    Failed,
     Stop,
 };
 use Innmind\Server\Control\Server\{
@@ -47,7 +47,7 @@ final class OutputDiff implements Ping
      * @param C $carry
      * @param callable(C): Either<L|Stop<C>, C> $ping
      *
-     * @return Either<WatchFailed|L, C>
+     * @return Either<Failed|L, C>
      */
     public function __invoke(mixed $carry, callable $ping): Either
     {
@@ -105,7 +105,7 @@ final class OutputDiff implements Ping
      *
      * @param C $carry
      *
-     * @return Either<WatchFailed, array{0: Output, 1: C}>
+     * @return Either<Failed, array{0: Output, 1: C}>
      */
     private function output(mixed $carry): Either
     {
@@ -116,7 +116,7 @@ final class OutputDiff implements Ping
             ->chunks();
 
         if (!$error->empty()) {
-            return Either::left(new WatchFailed);
+            return Either::left(new Failed);
         }
 
         return Either::right([$process->output(), $carry]);
@@ -131,9 +131,9 @@ final class OutputDiff implements Ping
      * @template C
      * @template L
      *
-     * @param L|Stop<C>|WatchFailed $value
+     * @param L|Stop<C>|Failed $value
      *
-     * @return Either<WatchFailed|L, C>
+     * @return Either<Failed|L, C>
      */
     private function switchStopValue(mixed $value): Either
     {

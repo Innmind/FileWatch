@@ -5,7 +5,7 @@ namespace Innmind\FileWatch\Ping;
 
 use Innmind\FileWatch\{
     Ping,
-    Exception\WatchFailed,
+    Failed,
     Stop,
 };
 use Innmind\Server\Control\Server\{
@@ -52,7 +52,7 @@ final class ProcessOutput implements Ping
                         }
 
                         if ($type === Type::error) {
-                            $carry = Either::left(new WatchFailed);
+                            $carry = Either::left(new Failed);
                         }
 
                         /** @psalm-suppress MixedArgument Doesn't understand the type of $carry when calling $ping */
@@ -85,9 +85,9 @@ final class ProcessOutput implements Ping
      * @template C
      * @template L
      *
-     * @param L|Stop<C>|WatchFailed $value
+     * @param L|Stop<C>|Failed $value
      *
-     * @return Either<WatchFailed|L, C>
+     * @return Either<Failed|L, C>
      */
     private function switchStopValue(mixed $value): Either
     {
