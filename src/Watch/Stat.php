@@ -33,20 +33,26 @@ final class Stat implements Watch
 
     public function __invoke(Path $file): Ping
     {
+        if (\PHP_OS === 'Linux') {
+            $stat = Command::foreground('xargs')
+                ->withArgument('stat')
+                ->withOption('format', '%y %n');
+        } else {
+            $stat = Command::foreground('xargs')
+                ->withArgument('stat')
+                ->withShortOption('f')
+                ->withArgument('%Sm %N')
+                ->withShortOption('t')
+                ->withArgument('%Y-%m-%dT%H-%M-%S');
+        }
+
         return new Ping\OutputDiff(
             $this->processes,
             Command::foreground('find')
                 ->withArgument($file->toString())
                 ->withShortOption('type')
                 ->withArgument('f')
-                ->pipe(
-                    Command::foreground('xargs')
-                        ->withArgument('stat')
-                        ->withShortOption('f')
-                        ->withArgument('%Sm %N')
-                        ->withShortOption('t')
-                        ->withArgument('%Y-%m-%dT%H-%M-%S'),
-                ),
+                ->pipe($stat),
             $this->halt,
             $this->period,
         );
