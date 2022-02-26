@@ -33,7 +33,7 @@ class FunctionalTest extends TestCase
             new Usleep,
         );
         $process = $processes->execute(Command::background(
-            'sleep 1 && echo foo >> /tmp/watch-file && sleep 1 && echo foo >> /tmp/watch-file',
+            'sleep 1 && echo foo >> /tmp/watch-file && sleep 1 && echo foo >> /tmp/watch-file && sleep 1 && echo foo >> /tmp/watch-file',
         ));
 
         $watch = Factory::build($processes, new Usleep);
@@ -69,7 +69,7 @@ class FunctionalTest extends TestCase
             new Usleep,
         );
         $process = $processes->execute(Command::background(
-            'sleep 1 && echo foo >> /tmp/watch-file && sleep 1 && echo foo >> /tmp/watch-file',
+            'sleep 1 && echo foo >> /tmp/watch-file && sleep 1 && echo foo >> /tmp/watch-file && sleep 1 && echo foo >> /tmp/watch-file',
         ));
 
         $watch = Factory::build($processes, new Usleep);
@@ -193,7 +193,7 @@ class FunctionalTest extends TestCase
             new Usleep,
         );
         $process = $processes->execute(Command::background(
-            'sleep 1 && echo foo >> /tmp/watch-file && sleep 1 && echo foo >> /tmp/watch-file',
+            'sleep 1 && echo foo >> /tmp/watch-file && sleep 1 && echo foo >> /tmp/watch-file && sleep 1 && echo foo >> /tmp/watch-file',
         ));
 
         $inner = Factory::build($processes, new Usleep);
