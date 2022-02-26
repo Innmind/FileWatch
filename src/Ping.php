@@ -4,17 +4,18 @@ declare(strict_types = 1);
 namespace Innmind\FileWatch;
 
 use Innmind\FileWatch\Exception\WatchFailed;
-use Innmind\Immutable\{
-    Either,
-    SideEffect,
-};
+use Innmind\Immutable\Either;
 
 interface Ping
 {
     /**
-     * @param callable(): void $ping
+     * @template C
+     * @template L
      *
-     * @return Either<WatchFailed, SideEffect>
+     * @param C $carry
+     * @param callable(C): Either<L|Stop<C>, C> $ping
+     *
+     * @return Either<WatchFailed|L, C>
      */
-    public function __invoke(callable $ping): Either;
+    public function __invoke(mixed $carry, callable $ping): Either;
 }

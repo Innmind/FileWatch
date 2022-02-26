@@ -6,6 +6,7 @@ namespace Innmind\FileWatch\Ping;
 use Innmind\FileWatch\{
     Ping,
     Exception\WatchFailed,
+    Stop,
 };
 use Innmind\Server\Control\Server\{
     Processes,
@@ -27,24 +28,44 @@ final class ProcessOutput implements Ping
         $this->command = $command;
     }
 
-    public function __invoke(callable $ping): Either
+    public function __invoke(mixed $carry, callable $ping): Either
     {
         $process = $this->processes->execute($this->command);
 
         try {
-            $_ = $process->output()->foreach(static function($_, $type) use ($ping) {
-                if ($type === Type::error) {
-                    throw new WatchFailed;
-                }
+            return $process
+                ->output()
+                ->reduce(
+                    Either::right($carry),
+                    function(Either $carry, $_, $type) use ($ping, $process): Either {
+                        // we may have a left as entry here because while we are
+                        // killing the process there may still be output transiting
+                        // up to here, but since we have a left value we no longer
+                        // want the $ping to be called
+                        $stopping = $carry->match(
+                            static fn() => false,
+                            static fn() => true,
+                        );
 
-                $ping();
-            });
+                        if ($stopping) {
+                            return $carry;
+                        }
 
-            return Either::right($_);
-        } catch (WatchFailed $e) {
-            $this->kill($process);
+                        if ($type === Type::error) {
+                            $carry = Either::left(new WatchFailed);
+                        }
 
-            return Either::left($e);
+                        /** @psalm-suppress MixedArgument Doesn't understand the type of $carry when calling $ping */
+                        return $carry
+                            ->flatMap(static fn($carry) => $ping($carry))
+                            ->leftMap(function($left) use ($process) {
+                                $this->kill($process);
+
+                                return $left;
+                            });
+                    },
+                )
+                ->otherwise($this->switchStopValue(...));
         } catch (\Throwable $e) {
             $this->kill($process);
 
@@ -58,5 +79,21 @@ final class ProcessOutput implements Ping
             fn($pid) => $this->processes->kill($pid, Signal::terminate),
             static fn() => null,
         );
+    }
+
+    /**
+     * @template C
+     * @template L
+     *
+     * @param L|Stop<C>|WatchFailed $value
+     *
+     * @return Either<WatchFailed|L, C>
+     */
+    private function switchStopValue(mixed $value): Either
+    {
+        return match ($value instanceof Stop) {
+            true => Either::right($value->value()),
+            false => Either::left($value),
+        };
     }
 }
