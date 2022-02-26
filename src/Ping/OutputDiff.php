@@ -116,7 +116,7 @@ final class OutputDiff implements Ping
             ->chunks();
 
         if (!$error->empty()) {
-            dump($error);
+            dump($error->toList());
             return Either::left(new Failed);
         }
 
