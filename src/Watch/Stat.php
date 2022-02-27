@@ -13,48 +13,51 @@ use Innmind\Server\Control\Server\{
     Command,
 };
 use Innmind\TimeWarp\Halt;
-use Innmind\TimeContinuum\{
-    Clock,
-    Period,
-};
+use Innmind\TimeContinuum\Period;
 
 final class Stat implements Watch
 {
     private Processes $processes;
     private Halt $halt;
-    private Clock $clock;
     private Period $period;
 
     public function __construct(
         Processes $processes,
         Halt $halt,
-        Clock $clock,
-        Period $period
+        Period $period,
     ) {
         $this->processes = $processes;
         $this->halt = $halt;
-        $this->clock = $clock;
         $this->period = $period;
     }
 
     public function __invoke(Path $file): Ping
     {
+        if (\PHP_OS === 'Linux') {
+            $stat = Command::foreground('xargs')
+                ->withShortOption('n', '1')
+                ->withShortOption('r')
+                ->withArgument('stat')
+                ->withOption('format', '%y %n');
+        } else {
+            $stat = Command::foreground('xargs')
+                ->withShortOption('n', '1')
+                ->withShortOption('r')
+                ->withArgument('stat')
+                ->withShortOption('f')
+                ->withArgument('%Sm %N')
+                ->withShortOption('t')
+                ->withArgument('%Y-%m-%dT%H-%M-%S');
+        }
+
         return new Ping\OutputDiff(
             $this->processes,
             Command::foreground('find')
                 ->withArgument($file->toString())
                 ->withShortOption('type')
                 ->withArgument('f')
-                ->pipe(
-                    Command::foreground('xargs')
-                        ->withArgument('stat')
-                        ->withShortOption('f')
-                        ->withArgument('%Sm %N')
-                        ->withShortOption('t')
-                        ->withArgument('%Y-%m-%dT%H-%M-%S'),
-                ),
+                ->pipe($stat),
             $this->halt,
-            $this->clock,
             $this->period,
         );
     }
