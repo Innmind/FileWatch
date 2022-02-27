@@ -15,7 +15,7 @@ final class Logger implements Watch
     private Watch $watch;
     private LoggerInterface $logger;
 
-    public function __construct(Watch $watch, LoggerInterface $logger)
+    private function __construct(Watch $watch, LoggerInterface $logger)
     {
         $this->watch = $watch;
         $this->logger = $logger;
@@ -23,10 +23,15 @@ final class Logger implements Watch
 
     public function __invoke(Path $path): Ping
     {
-        return new Ping\Logger(
+        return Ping\Logger::psr(
             ($this->watch)($path),
             $path,
             $this->logger,
         );
+    }
+
+    public static function psr(Watch $watch, LoggerInterface $logger): self
+    {
+        return new self($watch, $logger);
     }
 }

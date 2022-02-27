@@ -26,7 +26,7 @@ final class Tailf implements Watch
     {
         return new Ping\ProcessOutput(
             $this->processes,
-            Command::foreground("[ -f {$file->toString()} ] && tail")
+            Command::foreground('tail')
                 ->withShortOption('f')
                 ->withArgument($file->toString()),
         );
