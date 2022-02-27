@@ -18,7 +18,7 @@ final class Logger implements Ping
     private Path $path;
     private LoggerInterface $logger;
 
-    public function __construct(
+    private function __construct(
         Ping $ping,
         Path $path,
         LoggerInterface $logger,
@@ -54,5 +54,13 @@ final class Logger implements Ping
 
             return $ping($carry);
         });
+    }
+
+    public static function psr(
+        Ping $ping,
+        Path $path,
+        LoggerInterface $logger,
+    ): self {
+        return new self($ping, $path, $logger);
     }
 }

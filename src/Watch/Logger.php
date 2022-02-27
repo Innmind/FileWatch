@@ -23,7 +23,7 @@ final class Logger implements Watch
 
     public function __invoke(Path $path): Ping
     {
-        return new Ping\Logger(
+        return Ping\Logger::psr(
             ($this->watch)($path),
             $path,
             $this->logger,
