@@ -22,8 +22,6 @@
         "innmind/time-continuum": "~3.0",
         "psr/log": "~3.0"
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
     "autoload": {
         "psr-4": {
             "Innmind\\FileWatch\\": "src/"
