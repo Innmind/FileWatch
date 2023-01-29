@@ -109,17 +109,20 @@ final class OutputDiff implements Ping
      */
     private function output(mixed $carry): Either
     {
-        $process = $this->processes->execute($this->command);
-        $error = $process
-            ->output()
-            ->filter(static fn($_, $type) => $type === Type::error)
-            ->chunks();
-
-        if (!$error->empty()) {
-            return Either::left(new Failed);
-        }
-
-        return Either::right([$process->output(), $carry]);
+        return $this
+            ->processes
+            ->execute($this->command)
+            ->wait()
+            ->leftMap(static fn() => new Failed)
+            ->map(static fn($success) => $success->output())
+            ->filter(
+                static fn($output) => $output
+                    ->filter(static fn($_, $type) => $type === Type::error)
+                    ->chunks()
+                    ->empty(),
+                static fn() => new Failed,
+            )
+            ->map(static fn($output) => [$output, $carry]);
     }
 
     private function diff(Output $previous, Output $now): bool

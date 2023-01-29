@@ -15,7 +15,7 @@ use Innmind\Server\Control\Server\{
 };
 use Innmind\TimeContinuum\Earth\Clock;
 use Innmind\TimeWarp\Halt\Usleep;
-use Innmind\Stream\Watch\Select;
+use Innmind\Stream\Streams;
 use Innmind\Url\Path;
 use Innmind\Immutable\Either;
 use Psr\Log\LoggerInterface;
@@ -39,7 +39,7 @@ class FunctionalTest extends TestCase
         \touch('/tmp/innmind/watch-file');
         $processes = Unix::of(
             new Clock,
-            Select::timeoutAfter(...),
+            Streams::fromAmbientAuthority(),
             new Usleep,
         );
         $process = $processes->execute(Command::background(
@@ -72,7 +72,7 @@ class FunctionalTest extends TestCase
         \touch('/tmp/innmind/watch-file');
         $processes = Unix::of(
             new Clock,
-            Select::timeoutAfter(...),
+            Streams::fromAmbientAuthority(),
             new Usleep,
         );
         $process = $processes->execute(Command::background(
@@ -106,7 +106,7 @@ class FunctionalTest extends TestCase
     {
         $processes = Unix::of(
             new Clock,
-            Select::timeoutAfter(...),
+            Streams::fromAmbientAuthority(),
             new Usleep,
         );
         $process = $processes->execute(Command::background(
@@ -138,7 +138,7 @@ class FunctionalTest extends TestCase
     {
         $processes = Unix::of(
             new Clock,
-            Select::timeoutAfter(...),
+            Streams::fromAmbientAuthority(),
             new Usleep,
         );
         $process = $processes->execute(Command::background(
@@ -172,7 +172,7 @@ class FunctionalTest extends TestCase
     {
         $processes = Unix::of(
             new Clock,
-            Select::timeoutAfter(...),
+            Streams::fromAmbientAuthority(),
             new Usleep,
         );
 
@@ -193,7 +193,7 @@ class FunctionalTest extends TestCase
         \touch('/tmp/innmind/watch-file');
         $processes = Unix::of(
             new Clock,
-            Select::timeoutAfter(...),
+            Streams::fromAmbientAuthority(),
             new Usleep,
         );
         $process = $processes->execute(Command::background(
