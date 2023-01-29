@@ -22,14 +22,14 @@ use Innmind\FileWatch\{
 use Innmind\Server\Control\ServerFactory;
 use Innmind\TimeWarp\Halt\Usleep;
 use Innmind\TimeContinuum\Earth\Clock;
-use Innmind\Stream\Watch\Select;
+use Innmind\Stream\Streams;
 use Innmind\Url\Path;
 use Innmind\Immutable\Either;
 
 $watch = Factory::build(
     ServerFactory::build(
         new Clock,
-        Select::timeoutAfter(...),
+        Streams::fromAmbientAuthority(),
         new Usleep,
     )->processes(),
     new Usleep,
