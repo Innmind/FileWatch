@@ -73,6 +73,7 @@ final class OutputDiff implements Ping
             );
         } while ($continue);
 
+        /** @var Either<Failed|L, C> */
         return $previous
             ->map(static fn($state) => $state[1])
             ->otherwise($this->switchStopValue(...));
@@ -140,9 +141,9 @@ final class OutputDiff implements Ping
      */
     private function switchStopValue(mixed $value): Either
     {
-        return match ($value instanceof Stop) {
-            true => Either::right($value->value()),
-            false => Either::left($value),
+        return match (true) {
+            $value instanceof Stop => Either::right($value->value()),
+            default => Either::left($value),
         };
     }
 }
