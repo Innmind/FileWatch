@@ -203,22 +203,17 @@ class FunctionalTest extends TestCase
         $inner = Factory::build($processes, new Usleep);
         $watch = Logger::psr($inner, $logger = $this->createMock(LoggerInterface::class));
         $logger
-            ->expects($this->exactly(3))
+            ->expects($matcher = $this->exactly(3))
             ->method('info')
-            ->withConsecutive(
-                [
-                    'Starting to watch {path}',
-                    ['path' => '/tmp/innmind/watch-file'],
-                ],
-                [
-                    'Content at {path} changed',
-                    ['path' => '/tmp/innmind/watch-file'],
-                ],
-                [
-                    'Content at {path} changed',
-                    ['path' => '/tmp/innmind/watch-file'],
-                ],
-            );
+            ->willReturnCallback(function($message, $context) use ($matcher) {
+                match ($matcher->numberOfInvocations()) {
+                    1 => $this->assertSame('Starting to watch {path}', $message),
+                    2 => $this->assertSame('Content at {path} changed', $message),
+                    3 => $this->assertSame('Content at {path} changed', $message),
+                };
+
+                $this->assertSame(['path' => '/tmp/innmind/watch-file'], $context);
+            });
 
         $either = $watch(Path::of('/tmp/innmind/watch-file'))(0, static function($count) {
             ++$count;
