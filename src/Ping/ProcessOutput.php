@@ -28,11 +28,24 @@ final class ProcessOutput implements Ping
         $this->command = $command;
     }
 
+    /**
+     * @template C
+     * @template L
+     *
+     * @param C $carry
+     * @param callable(C): Either<L|Stop<C>, C> $ping
+     *
+     * @return Either<Failed|L, C>
+     */
     public function __invoke(mixed $carry, callable $ping): Either
     {
         $process = $this->processes->execute($this->command);
 
         try {
+            /**
+             * @psalm-suppress InvalidArgument Due to the reduce where Either types are not enterily defined
+             * @var Either<Failed|L, C>
+             */
             return $process
                 ->output()
                 ->reduce(
@@ -91,9 +104,9 @@ final class ProcessOutput implements Ping
      */
     private function switchStopValue(mixed $value): Either
     {
-        return match ($value instanceof Stop) {
-            true => Either::right($value->value()),
-            false => Either::left($value),
+        return match (true) {
+            $value instanceof Stop => Either::right($value->value()),
+            default => Either::left($value),
         };
     }
 }

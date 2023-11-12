@@ -1,5 +1,19 @@
 # Changelog
 
+## 3.2.0 - 2023-11-12
+
+### Added
+
+- `Innmind\FileWatch\Watch\Kind`
+
+### Changed
+
+- Directly use an output diff when the watched path targets a directory
+
+### Removed
+
+- Support for PHP `8.1`
+
 ## 3.1.0 - 2023-01-29
 
 ### Changed
