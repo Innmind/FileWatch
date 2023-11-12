@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Added
+
+- `Innmind\FileWatch\Watch\Kind`
+
+### Changed
+
+- Directly use an output diff when the watched path targets a directory
+
 ### Removed
 
 - Support for PHP `8.1`

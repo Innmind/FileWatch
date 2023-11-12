@@ -17,13 +17,19 @@ final class Factory
         Halt $halt,
         Period $interval = null,
     ): Watch {
-        return new Watch\Fallback(
-            new Watch\Tailf($processes),
-            new Watch\Stat(
-                $processes,
-                $halt,
-                $interval ?? new Second(1),
+        $files = new Watch\Tailf($processes);
+        $directories = new Watch\Stat(
+            $processes,
+            $halt,
+            $interval ?? new Second(1),
+        );
+
+        return new Watch\Kind(
+            new Watch\Fallback(
+                $files,
+                $directories,
             ),
+            $directories,
         );
     }
 }
