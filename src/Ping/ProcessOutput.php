@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Innmind\FileWatch\Ping;
 
 use Innmind\FileWatch\{
+    Continuation,
     Ping,
     Failed,
     Stop,
@@ -15,7 +16,10 @@ use Innmind\Server\Control\Server\{
     Signal,
     Process\Output\Type,
 };
-use Innmind\Immutable\Either;
+use Innmind\Immutable\{
+    Either,
+    Maybe,
+};
 
 final class ProcessOutput implements Ping
 {
@@ -30,21 +34,21 @@ final class ProcessOutput implements Ping
 
     /**
      * @template C
-     * @template L
+     * @template R
      *
      * @param C $carry
-     * @param callable(C): Either<L|Stop<C>, C> $ping
+     * @param callable(R|C, Continuation<R|C>): Continuation<R> $ping
      *
-     * @return Either<Failed|L, C>
+     * @return Maybe<R|C>
      */
-    public function __invoke(mixed $carry, callable $ping): Either
+    public function __invoke(mixed $carry, callable $ping): Maybe
     {
         $process = $this->processes->execute($this->command);
 
         try {
             /**
              * @psalm-suppress InvalidArgument Due to the reduce where Either types are not enterily defined
-             * @var Either<Failed|L, C>
+             * @var Maybe<R|C>
              */
             return $process
                 ->output()
@@ -70,7 +74,10 @@ final class ProcessOutput implements Ping
 
                         /** @psalm-suppress MixedArgument Doesn't understand the type of $carry when calling $ping */
                         return $carry
-                            ->flatMap(static fn($carry) => $ping($carry))
+                            ->flatMap(static fn($carry) => $ping($carry, Continuation::of($carry))->match(
+                                Either::right(...),
+                                static fn($value) => Either::left(Stop::of($value)),
+                            ))
                             ->leftMap(function($left) use ($process) {
                                 $this->kill($process);
 
@@ -78,7 +85,8 @@ final class ProcessOutput implements Ping
                             });
                     },
                 )
-                ->otherwise($this->switchStopValue(...));
+                ->otherwise($this->switchStopValue(...))
+                ->maybe();
         } catch (\Throwable $e) {
             $this->kill($process);
 
@@ -96,17 +104,18 @@ final class ProcessOutput implements Ping
 
     /**
      * @template C
-     * @template L
+     * @template R
      *
-     * @param L|Stop<C>|Failed $value
+     * @param R|Stop<C>|Failed $value
      *
-     * @return Either<Failed|L, C>
+     * @return Either<Failed, R|C>
      */
     private function switchStopValue(mixed $value): Either
     {
         return match (true) {
             $value instanceof Stop => Either::right($value->value()),
-            default => Either::left($value),
+            $value instanceof Failed => Either::left($value),
+            default => Either::right($value),
         };
     }
 }

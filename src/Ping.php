@@ -3,18 +3,18 @@ declare(strict_types = 1);
 
 namespace Innmind\FileWatch;
 
-use Innmind\Immutable\Either;
+use Innmind\Immutable\Maybe;
 
 interface Ping
 {
     /**
      * @template C
-     * @template L
+     * @template R
      *
      * @param C $carry
-     * @param callable(C): Either<L|Stop<C>, C> $ping
+     * @param callable(R|C, Continuation<R|C>): Continuation<R> $ping
      *
-     * @return Either<Failed|L, C>
+     * @return Maybe<R|C>
      */
-    public function __invoke(mixed $carry, callable $ping): Either;
+    public function __invoke(mixed $carry, callable $ping): Maybe;
 }

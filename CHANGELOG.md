@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- When the ping callable is called it must return a `Innmind\FileWatch\Continuation`
+
 ## 3.2.0 - 2023-11-12
 
 ### Added
