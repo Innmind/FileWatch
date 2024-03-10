@@ -6,8 +6,6 @@ namespace Innmind\FileWatch\Ping;
 use Innmind\FileWatch\{
     Continuation,
     Ping,
-    Failed,
-    Stop,
 };
 use Innmind\Server\Control\Server\{
     Processes,
