@@ -35,27 +35,23 @@ $watch = Factory::build(
     new Usleep,
 );
 
-$count = $watch(Path::of('/to/some/file/or/folder'))(0, function(int $count): Either {
+$count = $watch(Path::of('/to/some/file/or/folder'))(0, function(int $count, Continuation $continuation): Continuation {
     // this function is called every time the file is modified
     ++$count;
 
     if ($count === 42) {
-        // by returning a Stop instance on the left side it will instruct to
-        // stop watching for changes and the value in the Stop will be moved on
-        // the right side to the caller
-        return Either::left(Stop::of($count));
+        // This will stop watching the folder for changes and return the count
+        return $continuation->stop($count);
     }
 
-    if ($forSomeReason) {
-        // by returning a left value it will stop watching for changes and the
-        // Either will be returned as is to the caller
-        return Either::left($someReason);
-    }
-
-    // by returning a right side it will instruct to continue watching for changes
-    // and the value will be passed to this callable the next time it's called
-    return Either::right($count);
-});
+    // This will instruct to continue watching for changes and the value will be
+    // passed to this callable the next time it's called
+    return $continuation->continue($count);
+})->match(
+    static fn(int $count) => $count, // always 42 as it's the stopping value
+    static fn() => throw new \RuntimeException('Failed to watch for changes'),
+);
 ```
 
-**Note**: The function may be called multiple times for an single change due to the way `tail` and `stat` works.
+> [!WARNING]
+> The function may be called multiple times for an single change due to the way `tail` and `stat` works.

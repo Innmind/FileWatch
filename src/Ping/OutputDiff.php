@@ -5,8 +5,7 @@ namespace Innmind\FileWatch\Ping;
 
 use Innmind\FileWatch\{
     Ping,
-    Failed,
-    Stop,
+    Continuation,
 };
 use Innmind\Server\Control\Server\{
     Processes,
@@ -18,7 +17,7 @@ use Innmind\TimeWarp\Halt;
 use Innmind\TimeContinuum\Period;
 use Innmind\Immutable\{
     Either,
-    SideEffect,
+    Maybe,
 };
 
 final class OutputDiff implements Ping
@@ -42,14 +41,14 @@ final class OutputDiff implements Ping
 
     /**
      * @template C
-     * @template L
+     * @template R
      *
      * @param C $carry
-     * @param callable(C): Either<L|Stop<C>, C> $ping
+     * @param callable(R|C, Continuation<R|C>): Continuation<R> $ping
      *
-     * @return Either<Failed|L, C>
+     * @return Maybe<R|C>
      */
-    public function __invoke(mixed $carry, callable $ping): Either
+    public function __invoke(mixed $carry, callable $ping): Maybe
     {
         $previous = $this->output($carry);
 
@@ -73,20 +72,21 @@ final class OutputDiff implements Ping
             );
         } while ($continue);
 
-        /** @var Either<Failed|L, C> */
+        /** @var Maybe<R|C> */
         return $previous
             ->map(static fn($state) => $state[1])
-            ->otherwise($this->switchStopValue(...));
+            ->otherwise($this->switchStopValue(...))
+            ->maybe();
     }
 
     /**
      * @template C
-     * @template L
+     * @template R
      *
-     * @param callable(C): Either<L|Stop<C>, C> $ping
+     * @param callable(R|C, Continuation<R|C>): Continuation<R> $ping
      * @param C $carry
      *
-     * @return Either<L|Stop<C>, array{0: Output, 1: C}>
+     * @return Either<Stop<R|C>, array{0: Output, 1: R|C}>
      */
     private function maybePing(
         Output $previous,
@@ -95,7 +95,10 @@ final class OutputDiff implements Ping
         mixed $carry,
     ): Either {
         if ($this->diff($previous, $output)) {
-            return $ping($carry)->map(static fn($carry) => [$output, $carry]);
+            return $ping($carry, Continuation::of($carry))->match(
+                static fn($carry) => Either::right([$output, $carry]),
+                static fn($carry) => Either::left(Stop::of($carry)),
+            );
         }
 
         return Either::right([$output, $carry]);
@@ -133,17 +136,18 @@ final class OutputDiff implements Ping
 
     /**
      * @template C
-     * @template L
+     * @template R
      *
-     * @param L|Stop<C>|Failed $value
+     * @param R|Stop<C>|Failed $value
      *
-     * @return Either<Failed|L, C>
+     * @return Either<Failed, R|C>
      */
     private function switchStopValue(mixed $value): Either
     {
         return match (true) {
             $value instanceof Stop => Either::right($value->value()),
-            default => Either::left($value),
+            $value instanceof Failed => Either::left($value),
+            default => Either::right($value),
         };
     }
 }
