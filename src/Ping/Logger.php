@@ -4,12 +4,11 @@ declare(strict_types = 1);
 namespace Innmind\FileWatch\Ping;
 
 use Innmind\FileWatch\{
+    Continuation,
     Ping,
-    Stop,
-    Failed,
 };
 use Innmind\Url\Path;
-use Innmind\Immutable\Either;
+use Innmind\Immutable\Maybe;
 use Psr\Log\LoggerInterface;
 
 final class Logger implements Ping
@@ -30,29 +29,32 @@ final class Logger implements Ping
 
     /**
      * @template C
-     * @template L
+     * @template R
      *
      * @param C $carry
-     * @param callable(C): Either<L|Stop<C>, C> $ping
+     * @param callable(R|C, Continuation<R|C>): Continuation<R> $ping
      *
-     * @return Either<Failed|L, C>
+     * @return Maybe<R|C>
      */
-    public function __invoke(mixed $carry, callable $ping): Either
+    public function __invoke(mixed $carry, callable $ping): Maybe
     {
         $this->logger->info( // todo use debug
             'Starting to watch {path}',
             ['path' => $this->path->toString()],
         );
 
-        /** @var Either<Failed|L, C> */
-        return ($this->ping)($carry, function(mixed $carry) use ($ping): Either {
+        /**
+         * @psalm-suppress InvalidArgument
+         * @var Maybe<R|C>
+         */
+        return ($this->ping)($carry, function(mixed $carry, Continuation $continuation) use ($ping): Continuation {
             /** @var C $carry */
             $this->logger->info(
                 'Content at {path} changed',
                 ['path' => $this->path->toString()],
             );
 
-            return $ping($carry);
+            return $ping($carry, $continuation);
         });
     }
 

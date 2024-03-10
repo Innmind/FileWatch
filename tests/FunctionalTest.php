@@ -6,8 +6,6 @@ namespace Tests\Innmind\FileWatch;
 use Innmind\FileWatch\{
     Factory,
     Watch\Logger,
-    Failed,
-    Stop,
 };
 use Innmind\Server\Control\Server\{
     Processes\Unix,
@@ -17,7 +15,6 @@ use Innmind\TimeContinuum\Earth\Clock;
 use Innmind\TimeWarp\Halt\Usleep;
 use Innmind\Stream\Streams;
 use Innmind\Url\Path;
-use Innmind\Immutable\Either;
 use Psr\Log\LoggerInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -48,14 +45,14 @@ class FunctionalTest extends TestCase
 
         $watch = Factory::build($processes, new Usleep);
 
-        $either = $watch(Path::of('/tmp/innmind/watch-file'))(0, static function($count) {
+        $either = $watch(Path::of('/tmp/innmind/watch-file'))(0, static function($count, $continuation) {
             ++$count;
 
             if ($count === 2) {
-                return Either::left(Stop::of($count));
+                return $continuation->stop($count);
             }
 
-            return Either::right($count);
+            return $continuation->continue($count);
         });
 
         $this->assertSame(
@@ -63,41 +60,6 @@ class FunctionalTest extends TestCase
             $either->match(
                 static fn($count) => $count,
                 static fn() => null,
-            ),
-        );
-    }
-
-    public function testWatchFileReturnError()
-    {
-        \touch('/tmp/innmind/watch-file');
-        $processes = Unix::of(
-            new Clock,
-            Streams::fromAmbientAuthority(),
-            new Usleep,
-        );
-        $process = $processes->execute(Command::background(
-            'sleep 1 && echo foo >> /tmp/innmind/watch-file && sleep 1 && echo foo >> /tmp/innmind/watch-file && sleep 1 && echo foo >> /tmp/innmind/watch-file',
-        ));
-
-        $watch = Factory::build($processes, new Usleep);
-
-        $either = $watch(Path::of('/tmp/innmind/watch-file'))(0, static function($count) {
-            ++$count;
-
-            if ($count === 2) {
-                // because it's not an instance of Stop then it is considered
-                // as a general purpose error
-                return Either::left($count);
-            }
-
-            return Either::right($count);
-        });
-
-        $this->assertSame(
-            2,
-            $either->match(
-                static fn() => null,
-                static fn($count) => $count,
             ),
         );
     }
@@ -115,14 +77,14 @@ class FunctionalTest extends TestCase
 
         $watch = Factory::build($processes, new Usleep);
 
-        $either = $watch(Path::of('/tmp/innmind/'))(0, static function($count) {
+        $either = $watch(Path::of('/tmp/innmind/'))(0, static function($count, $continuation) {
             ++$count;
 
             if ($count === 2) {
-                return Either::left(Stop::of($count));
+                return $continuation->stop($count);
             }
 
-            return Either::right($count);
+            return $continuation->continue($count);
         });
 
         $this->assertSame(
@@ -130,40 +92,6 @@ class FunctionalTest extends TestCase
             $either->match(
                 static fn($count) => $count,
                 static fn() => null,
-            ),
-        );
-    }
-
-    public function testWatchDirectoryReturnError()
-    {
-        $processes = Unix::of(
-            new Clock,
-            Streams::fromAmbientAuthority(),
-            new Usleep,
-        );
-        $process = $processes->execute(Command::background(
-            'sleep 1 && touch /tmp/innmind/watch-file && sleep 1 && rm /tmp/innmind/watch-file',
-        ));
-
-        $watch = Factory::build($processes, new Usleep);
-
-        $either = $watch(Path::of('/tmp/innmind/'))(0, static function($count) {
-            ++$count;
-
-            if ($count === 2) {
-                // because it's not an instance of Stop then it is considered
-                // as a general purpose error
-                return Either::left($count);
-            }
-
-            return Either::right($count);
-        });
-
-        $this->assertSame(
-            2,
-            $either->match(
-                static fn() => null,
-                static fn($count) => $count,
             ),
         );
     }
@@ -178,13 +106,12 @@ class FunctionalTest extends TestCase
 
         $watch = Factory::build($processes, new Usleep);
 
-        $either = $watch(Path::of('/unknown/'))(null, static fn() => null);
+        $either = $watch(Path::of('/unknown/'))(null, static fn($_, $continuation) => $continuation);
 
-        $this->assertInstanceOf(
-            Failed::class,
+        $this->assertFalse(
             $either->match(
-                static fn() => null,
-                static fn($e) => $e,
+                static fn() => true,
+                static fn() => false,
             ),
         );
     }
@@ -215,14 +142,14 @@ class FunctionalTest extends TestCase
                 $this->assertSame(['path' => '/tmp/innmind/watch-file'], $context);
             });
 
-        $either = $watch(Path::of('/tmp/innmind/watch-file'))(0, static function($count) {
+        $either = $watch(Path::of('/tmp/innmind/watch-file'))(0, static function($count, $continuation) {
             ++$count;
 
             if ($count === 2) {
-                return Either::left(Stop::of($count));
+                return $continuation->stop($count);
             }
 
-            return Either::right($count);
+            return $continuation->continue($count);
         });
 
         $this->assertSame(

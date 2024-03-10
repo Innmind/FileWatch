@@ -1,9 +1,10 @@
 <?php
 declare(strict_types = 1);
 
-namespace Innmind\FileWatch;
+namespace Innmind\FileWatch\Ping;
 
 /**
+ * @internal
  * @template T
  */
 final class Stop
