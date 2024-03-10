@@ -16,10 +16,7 @@ use Innmind\Server\Control\Server\{
 };
 use Innmind\TimeWarp\Halt;
 use Innmind\TimeContinuum\Period;
-use Innmind\Immutable\{
-    Either,
-    SideEffect,
-};
+use Innmind\Immutable\Either;
 
 final class OutputDiff implements Ping
 {
