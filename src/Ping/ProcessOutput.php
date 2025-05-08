@@ -42,35 +42,29 @@ final class ProcessOutput implements Ping
         $process = $this->processes->execute($this->command)->unwrap();
         $failed = new \stdClass;
 
-        try {
-            $carry = $process
-                ->output()
-                ->map(static fn($chunk) => $chunk->type())
-                ->sink($carry)
-                ->until(static function($carry, $type, $continuation) use ($ping, $failed) {
-                    if ($type === Type::error) {
-                        /** @psalm-suppress InvalidArgument */
-                        return $continuation->stop($failed);
-                    }
+        $carry = $process
+            ->output()
+            ->map(static fn($chunk) => $chunk->type())
+            ->sink($carry)
+            ->until(static function($carry, $type, $continuation) use ($ping, $failed) {
+                if ($type === Type::error) {
+                    /** @psalm-suppress InvalidArgument */
+                    return $continuation->stop($failed);
+                }
 
-                    /** @psalm-suppress MixedArgument */
-                    return $ping($carry, Continuation::of($carry))->match(
-                        $continuation->continue(...),
-                        $continuation->stop(...),
-                    );
-                });
+                /** @psalm-suppress MixedArgument */
+                return $ping($carry, Continuation::of($carry))->match(
+                    $continuation->continue(...),
+                    $continuation->stop(...),
+                );
+            });
 
-            $this->kill($process);
+        $this->kill($process);
 
-            return match ($carry) {
-                $failed => Maybe::nothing(),
-                default => Maybe::just($carry),
-            };
-        } catch (\Throwable $e) {
-            $this->kill($process);
-
-            throw $e;
-        }
+        return match ($carry) {
+            $failed => Maybe::nothing(),
+            default => Maybe::just($carry),
+        };
     }
 
     private function kill(Process $process): void
