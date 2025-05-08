@@ -3,10 +3,15 @@ declare(strict_types = 1);
 
 namespace Innmind\FileWatch;
 
-use Innmind\Immutable\Maybe;
+use Innmind\Immutable\Attempt;
 
-interface Ping
+final class Ping
 {
+    private function __construct(
+        private Ping\Implementation $implementation,
+    ) {
+    }
+
     /**
      * @template C
      * @template R
@@ -14,7 +19,18 @@ interface Ping
      * @param C $carry
      * @param callable(R|C, Continuation<R|C>): Continuation<R> $ping
      *
-     * @return Maybe<R|C>
+     * @return Attempt<R|C>
      */
-    public function __invoke(mixed $carry, callable $ping): Maybe;
+    public function __invoke(mixed $carry, callable $ping): Attempt
+    {
+        return ($this->implementation)($carry, $ping);
+    }
+
+    /**
+     * @internal
+     */
+    public static function of(Ping\Implementation $implementation): self
+    {
+        return new self($implementation);
+    }
 }

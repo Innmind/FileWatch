@@ -3,10 +3,7 @@ declare(strict_types = 1);
 
 namespace Innmind\FileWatch\Watch;
 
-use Innmind\FileWatch\{
-    Watch,
-    Ping,
-};
+use Innmind\FileWatch\Ping;
 use Innmind\Url\Path;
 use Innmind\Server\Control\Server\{
     Processes,
@@ -15,23 +12,19 @@ use Innmind\Server\Control\Server\{
 use Innmind\TimeWarp\Halt;
 use Innmind\TimeContinuum\Period;
 
-final class Stat implements Watch
+/**
+ * @internal
+ */
+final class Stat
 {
-    private Processes $processes;
-    private Halt $halt;
-    private Period $period;
-
     public function __construct(
-        Processes $processes,
-        Halt $halt,
-        Period $period,
+        private Processes $processes,
+        private Halt $halt,
+        private Period $period,
     ) {
-        $this->processes = $processes;
-        $this->halt = $halt;
-        $this->period = $period;
     }
 
-    public function __invoke(Path $file): Ping
+    public function __invoke(Path $file): Ping\OutputDiff
     {
         if (\PHP_OS === 'Linux') {
             $stat = Command::foreground('xargs')

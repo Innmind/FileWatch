@@ -11,17 +11,13 @@ use Innmind\FileWatch\Continuation\State;
  */
 final class Continuation
 {
-    private State $state;
-    /** @var T */
-    private mixed $value;
-
     /**
      * @param T $value
      */
-    private function __construct(State $state, mixed $value)
-    {
-        $this->state = $state;
-        $this->value = $value;
+    private function __construct(
+        private State $state,
+        private mixed $value,
+    ) {
     }
 
     /**

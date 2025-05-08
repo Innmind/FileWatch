@@ -1,5 +1,19 @@
 # Changelog
 
+## 5.0.0 - 2025-05-08
+
+### Changed
+
+- `Innmind\FileWatch\Ping::__invoke()` now returns an `Innmind\Immutable\Attempt`
+- `Innmind\FileWatch\Watch` is now a final class
+- `Innmind\FileWatch\Ping` is now a final class
+- All classes in `Innmind\FileWatch\Watch\*` and `Innmind\FileWatch\Ping\*` are now flagged as internal
+
+### Fixed
+
+- PHP `8.4` deprecation
+- Fix a memory leak when watching a file that has been changed many times
+
 ## 4.0.0 - 2024-03-10
 
 ### Changed

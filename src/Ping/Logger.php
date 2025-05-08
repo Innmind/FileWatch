@@ -3,28 +3,21 @@ declare(strict_types = 1);
 
 namespace Innmind\FileWatch\Ping;
 
-use Innmind\FileWatch\{
-    Continuation,
-    Ping,
-};
+use Innmind\FileWatch\Continuation;
 use Innmind\Url\Path;
-use Innmind\Immutable\Maybe;
+use Innmind\Immutable\Attempt;
 use Psr\Log\LoggerInterface;
 
-final class Logger implements Ping
+/**
+ * @internal
+ */
+final class Logger implements Implementation
 {
-    private Ping $ping;
-    private Path $path;
-    private LoggerInterface $logger;
-
     private function __construct(
-        Ping $ping,
-        Path $path,
-        LoggerInterface $logger,
+        private Implementation $ping,
+        private Path $path,
+        private LoggerInterface $logger,
     ) {
-        $this->ping = $ping;
-        $this->path = $path;
-        $this->logger = $logger;
     }
 
     /**
@@ -34,9 +27,10 @@ final class Logger implements Ping
      * @param C $carry
      * @param callable(R|C, Continuation<R|C>): Continuation<R> $ping
      *
-     * @return Maybe<R|C>
+     * @return Attempt<R|C>
      */
-    public function __invoke(mixed $carry, callable $ping): Maybe
+    #[\Override]
+    public function __invoke(mixed $carry, callable $ping): Attempt
     {
         $this->logger->info( // todo use debug
             'Starting to watch {path}',
@@ -45,7 +39,7 @@ final class Logger implements Ping
 
         /**
          * @psalm-suppress InvalidArgument
-         * @var Maybe<R|C>
+         * @var Attempt<R|C>
          */
         return ($this->ping)($carry, function(mixed $carry, Continuation $continuation) use ($ping): Continuation {
             /** @var C $carry */
@@ -58,8 +52,11 @@ final class Logger implements Ping
         });
     }
 
+    /**
+     * @internal
+     */
     public static function psr(
-        Ping $ping,
+        Implementation $ping,
         Path $path,
         LoggerInterface $logger,
     ): self {

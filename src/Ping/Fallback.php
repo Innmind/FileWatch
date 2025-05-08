@@ -3,23 +3,23 @@ declare(strict_types = 1);
 
 namespace Innmind\FileWatch\Ping;
 
-use Innmind\FileWatch\Ping;
-use Innmind\Immutable\Maybe;
+use Innmind\Immutable\Attempt;
 
-final class Fallback implements Ping
+/**
+ * @internal
+ */
+final class Fallback implements Implementation
 {
-    private Ping $attempt;
-    private Ping $fallback;
-
-    public function __construct(Ping $attempt, Ping $fallback)
-    {
-        $this->attempt = $attempt;
-        $this->fallback = $fallback;
+    public function __construct(
+        private ProcessOutput $attempt,
+        private OutputDiff $fallback,
+    ) {
     }
 
-    public function __invoke(mixed $carry, callable $ping): Maybe
+    #[\Override]
+    public function __invoke(mixed $carry, callable $ping): Attempt
     {
-        return ($this->attempt)($carry, $ping)->otherwise(
+        return ($this->attempt)($carry, $ping)->recover(
             fn() => ($this->fallback)($carry, $ping),
         );
     }

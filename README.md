@@ -21,18 +21,18 @@ use Innmind\FileWatch\{
 };
 use Innmind\Server\Control\ServerFactory;
 use Innmind\TimeWarp\Halt\Usleep;
-use Innmind\TimeContinuum\Earth\Clock;
-use Innmind\Stream\Streams;
+use Innmind\TimeContinuum\Clock;
+use Innmind\IO\IO;
 use Innmind\Url\Path;
 use Innmind\Immutable\Either;
 
 $watch = Factory::build(
     ServerFactory::build(
-        new Clock,
-        Streams::fromAmbientAuthority(),
-        new Usleep,
+        Clock::live(),
+        IO::fromAmbientAuthority(),
+        Usleep::new(),
     )->processes(),
-    new Usleep,
+    Usleep::new(),
 );
 
 $count = $watch(Path::of('/to/some/file/or/folder'))(0, function(int $count, Continuation $continuation): Continuation {
@@ -49,9 +49,9 @@ $count = $watch(Path::of('/to/some/file/or/folder'))(0, function(int $count, Con
     return $continuation->continue($count);
 })->match(
     static fn(int $count) => $count, // always 42 as it's the stopping value
-    static fn() => throw new \RuntimeException('Failed to watch for changes'),
+    static fn(\Throwable $e) => throw $e,
 );
 ```
 
 > [!WARNING]
-> The function may be called multiple times for an single change due to the way `tail` and `stat` works.
+> The function may be called multiple times for a single change due to the way `tail` and `stat` works.
