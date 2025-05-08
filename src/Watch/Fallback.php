@@ -17,7 +17,7 @@ final class Fallback
         $this->fallback = $fallback;
     }
 
-    public function __invoke(Path $file): Ping
+    public function __invoke(Path $file): Ping\Implementation
     {
         return new Ping\Fallback(
             ($this->attempt)($file),

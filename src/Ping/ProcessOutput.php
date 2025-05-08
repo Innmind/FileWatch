@@ -3,10 +3,7 @@ declare(strict_types = 1);
 
 namespace Innmind\FileWatch\Ping;
 
-use Innmind\FileWatch\{
-    Continuation,
-    Ping,
-};
+use Innmind\FileWatch\Continuation;
 use Innmind\Server\Control\Server\{
     Processes,
     Command,
@@ -19,7 +16,7 @@ use Innmind\Immutable\{
     SideEffect,
 };
 
-final class ProcessOutput implements Ping
+final class ProcessOutput implements Implementation
 {
     private Processes $processes;
     private Command $command;

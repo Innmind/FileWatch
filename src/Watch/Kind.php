@@ -17,7 +17,7 @@ final class Kind
         $this->directories = $directories;
     }
 
-    public function __invoke(Path $file): Ping
+    public function __invoke(Path $file): Ping\Implementation
     {
         return match ($file->directory()) {
             true => ($this->directories)($file),

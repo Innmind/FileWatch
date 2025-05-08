@@ -3,10 +3,7 @@ declare(strict_types = 1);
 
 namespace Innmind\FileWatch\Ping;
 
-use Innmind\FileWatch\{
-    Ping,
-    Continuation,
-};
+use Innmind\FileWatch\Continuation;
 use Innmind\Server\Control\Server\{
     Processes,
     Command,
@@ -22,7 +19,7 @@ use Innmind\Immutable\{
     Predicate\Instance,
 };
 
-final class OutputDiff implements Ping
+final class OutputDiff implements Implementation
 {
     private Processes $processes;
     private Command $command;

@@ -5,8 +5,13 @@ namespace Innmind\FileWatch;
 
 use Innmind\Immutable\Attempt;
 
-interface Ping
+final class Ping
 {
+    private function __construct(
+        private Ping\Implementation $implementation,
+    ) {
+    }
+
     /**
      * @template C
      * @template R
@@ -16,5 +21,16 @@ interface Ping
      *
      * @return Attempt<R|C>
      */
-    public function __invoke(mixed $carry, callable $ping): Attempt;
+    public function __invoke(mixed $carry, callable $ping): Attempt
+    {
+        return ($this->implementation)($carry, $ping);
+    }
+
+    /**
+     * @internal
+     */
+    public static function of(Ping\Implementation $implementation): self
+    {
+        return new self($implementation);
+    }
 }

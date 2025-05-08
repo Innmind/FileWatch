@@ -3,22 +3,19 @@ declare(strict_types = 1);
 
 namespace Innmind\FileWatch\Ping;
 
-use Innmind\FileWatch\{
-    Continuation,
-    Ping,
-};
+use Innmind\FileWatch\Continuation;
 use Innmind\Url\Path;
 use Innmind\Immutable\Attempt;
 use Psr\Log\LoggerInterface;
 
-final class Logger implements Ping
+final class Logger implements Implementation
 {
-    private Ping $ping;
+    private Implementation $ping;
     private Path $path;
     private LoggerInterface $logger;
 
     private function __construct(
-        Ping $ping,
+        Implementation $ping,
         Path $path,
         LoggerInterface $logger,
     ) {
@@ -60,7 +57,7 @@ final class Logger implements Ping
     }
 
     public static function psr(
-        Ping $ping,
+        Implementation $ping,
         Path $path,
         LoggerInterface $logger,
     ): self {

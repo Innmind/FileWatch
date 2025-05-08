@@ -18,7 +18,7 @@ final class Logger
         $this->logger = $logger;
     }
 
-    public function __invoke(Path $path): Ping
+    public function __invoke(Path $path): Ping\Implementation
     {
         return Ping\Logger::psr(
             ($this->watch)($path),

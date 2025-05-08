@@ -25,7 +25,7 @@ final class Watch
 
     public function __invoke(Path $file): Ping
     {
-        return ($this->implementation)($file);
+        return Ping::of(($this->implementation)($file));
     }
 
     public static function of(
