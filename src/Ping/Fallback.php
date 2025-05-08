@@ -3,15 +3,17 @@ declare(strict_types = 1);
 
 namespace Innmind\FileWatch\Ping;
 
-use Innmind\FileWatch\Ping;
 use Innmind\Immutable\Attempt;
 
-final class Fallback implements Ping
+/**
+ * @internal
+ */
+final class Fallback implements Implementation
 {
-    private Ping $attempt;
-    private Ping $fallback;
+    private ProcessOutput $attempt;
+    private OutputDiff $fallback;
 
-    public function __construct(Ping $attempt, Ping $fallback)
+    public function __construct(ProcessOutput $attempt, OutputDiff $fallback)
     {
         $this->attempt = $attempt;
         $this->fallback = $fallback;

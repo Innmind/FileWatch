@@ -3,26 +3,25 @@ declare(strict_types = 1);
 
 namespace Innmind\FileWatch\Watch;
 
-use Innmind\FileWatch\{
-    Watch,
-    Ping,
-};
+use Innmind\FileWatch\Ping;
 use Innmind\Url\Path;
 use Psr\Log\LoggerInterface;
 
-final class Logger implements Watch
+/**
+ * @internal
+ */
+final class Logger
 {
-    private Watch $watch;
+    private Kind $watch;
     private LoggerInterface $logger;
 
-    private function __construct(Watch $watch, LoggerInterface $logger)
+    private function __construct(Kind $watch, LoggerInterface $logger)
     {
         $this->watch = $watch;
         $this->logger = $logger;
     }
 
-    #[\Override]
-    public function __invoke(Path $path): Ping
+    public function __invoke(Path $path): Ping\Implementation
     {
         return Ping\Logger::psr(
             ($this->watch)($path),
@@ -31,8 +30,17 @@ final class Logger implements Watch
         );
     }
 
-    public static function psr(Watch $watch, LoggerInterface $logger): self
+    public static function psr(Kind|self $watch, LoggerInterface $logger): self
     {
-        return new self($watch, $logger);
+        return new self(self::extract($watch), $logger);
+    }
+
+    private static function extract(Kind|self $watch): Kind
+    {
+        if ($watch instanceof Kind) {
+            return $watch;
+        }
+
+        return self::extract($watch->watch);
     }
 }

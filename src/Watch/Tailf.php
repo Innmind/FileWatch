@@ -3,17 +3,17 @@ declare(strict_types = 1);
 
 namespace Innmind\FileWatch\Watch;
 
-use Innmind\FileWatch\{
-    Watch,
-    Ping,
-};
+use Innmind\FileWatch\Ping;
 use Innmind\Url\Path;
 use Innmind\Server\Control\Server\{
     Processes,
     Command,
 };
 
-final class Tailf implements Watch
+/**
+ * @internal
+ */
+final class Tailf
 {
     private Processes $processes;
 
@@ -22,8 +22,7 @@ final class Tailf implements Watch
         $this->processes = $processes;
     }
 
-    #[\Override]
-    public function __invoke(Path $file): Ping
+    public function __invoke(Path $file): Ping\ProcessOutput
     {
         return new Ping\ProcessOutput(
             $this->processes,
