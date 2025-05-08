@@ -5,6 +5,7 @@
 ### Fixed
 
 - PHP `8.4` deprecation
+- Fix a memory leak when watching a file that has been changed many times
 
 ## 4.0.0 - 2024-03-10
 
