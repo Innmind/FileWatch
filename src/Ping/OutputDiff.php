@@ -16,10 +16,10 @@ use Innmind\Server\Control\Server\{
 use Innmind\TimeWarp\Halt;
 use Innmind\TimeContinuum\Period;
 use Innmind\Immutable\{
-    Either,
     Maybe,
     Sequence,
     Monoid\Concat,
+    Predicate\Instance,
 };
 
 final class OutputDiff implements Ping
@@ -53,85 +53,76 @@ final class OutputDiff implements Ping
     #[\Override]
     public function __invoke(mixed $carry, callable $ping): Maybe
     {
-        $previous = $this->output($carry);
+        $stop = new \stdClass;
 
-        do {
-            ($this->halt)($this->period);
-            $previous = $previous->flatMap(function($state) use ($ping) {
-                [$previous, $carry] = $state;
+        $result = Sequence::lazy(function() {
+            while (true) {
+                yield $this->output();
+                ($this->halt)($this->period);
+            }
+        })
+            ->flatMap(static fn($maybe) => $maybe->match(
+                Sequence::of(...),
+                static fn() => Sequence::of(new Failed, $stop),
+            ))
+            ->takeWhile(static fn($value) => $value !== $stop)
+            ->keep(
+                Instance::of(Sequence::class)
+                    ->or(Instance::of(Failed::class)),
+            )
+            ->aggregate(function($previous, $now) {
+                if ($previous instanceof Failed) {
+                    return Sequence::of($previous);
+                }
 
-                return $this
-                    ->output($carry)
-                    ->flatMap(function($state) use ($previous, $ping) {
-                        [$output, $carry] = $state;
+                if ($now instanceof Failed) {
+                    return Sequence::of($now);
+                }
 
-                        return $this->maybePing($previous, $output, $ping, $carry);
-                    });
+                /**
+                 * @psalm-suppress MixedArgument
+                 * @psalm-suppress MixedArgumentTypeCoercion
+                 */
+                return match ($this->diff($previous, $now)) {
+                    true => Sequence::of($previous, $now),
+                    false => Sequence::of($now),
+                };
+            })
+            ->sink($carry)
+            ->until(static function($carry, $output, $continuation) use ($ping) {
+                if ($output instanceof Failed) {
+                    /** @psalm-suppress InvalidArgument */
+                    return $continuation->stop($output);
+                }
+
+                /** @psalm-suppress MixedArgument */
+                return $ping($carry, Continuation::of($carry))->match(
+                    $continuation->continue(...),
+                    $continuation->stop(...),
+                );
             });
 
-            $continue = $previous->match(
-                static fn() => true,
-                static fn() => false,
-            );
-        } while ($continue);
-
-        /** @var Maybe<R|C> */
-        return $previous
-            ->map(static fn($state) => $state[1])
-            ->otherwise($this->switchStopValue(...))
-            ->maybe();
-    }
-
-    /**
-     * @template C
-     * @template R
-     *
-     * @param Sequence<Output\Chunk> $previous
-     * @param Sequence<Output\Chunk> $output
-     * @param callable(R|C, Continuation<R|C>): Continuation<R> $ping
-     * @param C $carry
-     *
-     * @return Either<Stop<R|C>, array{0: Sequence<Output\Chunk>, 1: R|C}>
-     */
-    private function maybePing(
-        Sequence $previous,
-        Sequence $output,
-        callable $ping,
-        mixed $carry,
-    ): Either {
-        if ($this->diff($previous, $output)) {
-            return $ping($carry, Continuation::of($carry))->match(
-                static fn($carry) => Either::right([$output, $carry]),
-                static fn($carry) => Either::left(Stop::of($carry)),
-            );
+        if ($result instanceof Failed) {
+            return Maybe::nothing();
         }
 
-        return Either::right([$output, $carry]);
+        return Maybe::just($result);
     }
 
     /**
-     * @template C
-     *
-     * @param C $carry
-     *
-     * @return Either<Failed, array{0: Sequence<Output\Chunk>, 1: C}>
+     * @return Maybe<Sequence<Output\Chunk>>
      */
-    private function output(mixed $carry): Either
+    private function output(): Maybe
     {
         return $this
             ->processes
             ->execute($this->command)
-            ->unwrap()
-            ->wait()
-            ->leftMap(static fn() => new Failed)
+            ->maybe()
+            ->flatMap(static fn($process) => $process->wait()->maybe())
             ->map(static fn($success) => $success->output())
-            ->filter(
-                static fn($output) => !$output->any(
-                    static fn($chunk) => $chunk->type() === Type::error,
-                ),
-                static fn() => new Failed,
-            )
-            ->map(static fn($output) => [$output, $carry]);
+            ->filter(static fn($output) => !$output->any(
+                static fn($chunk) => $chunk->type() === Type::error,
+            ));
     }
 
     /**
@@ -150,22 +141,5 @@ final class OutputDiff implements Ping
             ->toString();
 
         return $previous !== $now;
-    }
-
-    /**
-     * @template C
-     * @template R
-     *
-     * @param R|Stop<C>|Failed $value
-     *
-     * @return Either<Failed, R|C>
-     */
-    private function switchStopValue(mixed $value): Either
-    {
-        return match (true) {
-            $value instanceof Stop => Either::right($value->value()),
-            $value instanceof Failed => Either::left($value),
-            default => Either::right($value),
-        };
     }
 }
