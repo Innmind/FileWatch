@@ -16,7 +16,7 @@ use Innmind\Server\Control\Server\{
 use Innmind\TimeWarp\Halt;
 use Innmind\TimeContinuum\Period;
 use Innmind\Immutable\{
-    Maybe,
+    Attempt,
     Sequence,
     Monoid\Concat,
     Predicate\Instance,
@@ -48,10 +48,10 @@ final class OutputDiff implements Ping
      * @param C $carry
      * @param callable(R|C, Continuation<R|C>): Continuation<R> $ping
      *
-     * @return Maybe<R|C>
+     * @return Attempt<R|C>
      */
     #[\Override]
-    public function __invoke(mixed $carry, callable $ping): Maybe
+    public function __invoke(mixed $carry, callable $ping): Attempt
     {
         $stop = new \stdClass;
 
@@ -63,19 +63,19 @@ final class OutputDiff implements Ping
         })
             ->flatMap(static fn($maybe) => $maybe->match(
                 Sequence::of(...),
-                static fn() => Sequence::of(new Failed, $stop),
+                static fn($e) => Sequence::of($e, $stop),
             ))
             ->takeWhile(static fn($value) => $value !== $stop)
             ->keep(
                 Instance::of(Sequence::class)
-                    ->or(Instance::of(Failed::class)),
+                    ->or(Instance::of(\Throwable::class)),
             )
             ->aggregate(function($previous, $now) {
-                if ($previous instanceof Failed) {
+                if ($previous instanceof \Throwable) {
                     return Sequence::of($previous);
                 }
 
-                if ($now instanceof Failed) {
+                if ($now instanceof \Throwable) {
                     return Sequence::of($now);
                 }
 
@@ -90,7 +90,7 @@ final class OutputDiff implements Ping
             })
             ->sink($carry)
             ->until(static function($carry, $output, $continuation) use ($ping) {
-                if ($output instanceof Failed) {
+                if ($output instanceof \Throwable) {
                     /** @psalm-suppress InvalidArgument */
                     return $continuation->stop($output);
                 }
@@ -102,27 +102,39 @@ final class OutputDiff implements Ping
                 );
             });
 
-        if ($result instanceof Failed) {
-            return Maybe::nothing();
+        if ($result instanceof \Throwable) {
+            return Attempt::error($result);
         }
 
-        return Maybe::just($result);
+        return Attempt::result($result);
     }
 
     /**
-     * @return Maybe<Sequence<Output\Chunk>>
+     * @return Attempt<Sequence<Output\Chunk>>
      */
-    private function output(): Maybe
+    private function output(): Attempt
     {
         return $this
             ->processes
             ->execute($this->command)
-            ->maybe()
-            ->flatMap(static fn($process) => $process->wait()->maybe())
+            ->flatMap(static fn($process) => $process->wait()->match(
+                Attempt::result(...),
+                fn() => Attempt::error(new \RuntimeException(\sprintf(
+                    'Failed to run command "%s"',
+                    $this->command->toString(),
+                ))),
+            ))
             ->map(static fn($success) => $success->output())
-            ->filter(static fn($output) => !$output->any(
-                static fn($chunk) => $chunk->type() === Type::error,
-            ));
+            ->flatMap(
+                static fn($output) => $output
+                    ->find(static fn($chunk) => $chunk->type() === Type::error)
+                    ->match(
+                        static fn($chunk) => Attempt::error(new \RuntimeException(
+                            $chunk->data()->toString(),
+                        )),
+                        static fn() => Attempt::result($output),
+                    ),
+            );
     }
 
     /**

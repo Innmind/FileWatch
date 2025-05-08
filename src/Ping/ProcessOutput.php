@@ -14,7 +14,10 @@ use Innmind\Server\Control\Server\{
     Signal,
     Process\Output\Type,
 };
-use Innmind\Immutable\Maybe;
+use Innmind\Immutable\{
+    Attempt,
+    SideEffect,
+};
 
 final class ProcessOutput implements Ping
 {
@@ -34,44 +37,51 @@ final class ProcessOutput implements Ping
      * @param C $carry
      * @param callable(R|C, Continuation<R|C>): Continuation<R> $ping
      *
-     * @return Maybe<R|C>
+     * @return Attempt<R|C>
      */
     #[\Override]
-    public function __invoke(mixed $carry, callable $ping): Maybe
+    public function __invoke(mixed $carry, callable $ping): Attempt
     {
-        $process = $this->processes->execute($this->command)->unwrap();
-        $failed = new \stdClass;
+        return $this
+            ->processes
+            ->execute($this->command)
+            ->flatMap(function($process) use ($carry, $ping) {
+                $failed = new \stdClass;
 
-        $carry = $process
-            ->output()
-            ->map(static fn($chunk) => $chunk->type())
-            ->sink($carry)
-            ->until(static function($carry, $type, $continuation) use ($ping, $failed) {
-                if ($type === Type::error) {
-                    /** @psalm-suppress InvalidArgument */
-                    return $continuation->stop($failed);
-                }
+                $carry = $process
+                    ->output()
+                    ->map(static fn($chunk) => $chunk->type())
+                    ->sink($carry)
+                    ->until(static function($carry, $type, $continuation) use ($ping, $failed) {
+                        if ($type === Type::error) {
+                            /** @psalm-suppress InvalidArgument */
+                            return $continuation->stop($failed);
+                        }
 
-                /** @psalm-suppress MixedArgument */
-                return $ping($carry, Continuation::of($carry))->match(
-                    $continuation->continue(...),
-                    $continuation->stop(...),
-                );
+                        /** @psalm-suppress MixedArgument */
+                        return $ping($carry, Continuation::of($carry))->match(
+                            $continuation->continue(...),
+                            $continuation->stop(...),
+                        );
+                    });
+
+                return $this
+                    ->kill($process)
+                    ->flatMap(static fn() => match ($carry) {
+                        $failed => Attempt::error(new \Exception('An error occured')),
+                        default => Attempt::result($carry),
+                    });
             });
-
-        $this->kill($process);
-
-        return match ($carry) {
-            $failed => Maybe::nothing(),
-            default => Maybe::just($carry),
-        };
     }
 
-    private function kill(Process $process): void
+    /**
+     * @return Attempt<SideEffect>
+     */
+    private function kill(Process $process): Attempt
     {
-        $_ = $process->pid()->match(
+        return $process->pid()->match(
             fn($pid) => $this->processes->kill($pid, Signal::terminate),
-            static fn() => null,
+            static fn() => Attempt::result(SideEffect::identity()),
         );
     }
 }

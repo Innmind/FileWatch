@@ -8,7 +8,7 @@ use Innmind\FileWatch\{
     Ping,
 };
 use Innmind\Url\Path;
-use Innmind\Immutable\Maybe;
+use Innmind\Immutable\Attempt;
 use Psr\Log\LoggerInterface;
 
 final class Logger implements Ping
@@ -34,10 +34,10 @@ final class Logger implements Ping
      * @param C $carry
      * @param callable(R|C, Continuation<R|C>): Continuation<R> $ping
      *
-     * @return Maybe<R|C>
+     * @return Attempt<R|C>
      */
     #[\Override]
-    public function __invoke(mixed $carry, callable $ping): Maybe
+    public function __invoke(mixed $carry, callable $ping): Attempt
     {
         $this->logger->info( // todo use debug
             'Starting to watch {path}',
@@ -46,7 +46,7 @@ final class Logger implements Ping
 
         /**
          * @psalm-suppress InvalidArgument
-         * @var Maybe<R|C>
+         * @var Attempt<R|C>
          */
         return ($this->ping)($carry, function(mixed $carry, Continuation $continuation) use ($ping): Continuation {
             /** @var C $carry */

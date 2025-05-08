@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- `Innmind\FileWatch\Ping::__invoke()` now returns an `Innmind\Immutable\Attempt`
+
 ### Fixed
 
 - PHP `8.4` deprecation
