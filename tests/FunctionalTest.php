@@ -5,7 +5,7 @@ namespace Tests\Innmind\FileWatch;
 
 use Innmind\FileWatch\{
     Factory,
-    Watch\Logger,
+    Watch,
 };
 use Innmind\Server\Control\Server\{
     Processes\Unix,
@@ -128,7 +128,7 @@ class FunctionalTest extends TestCase
         ));
 
         $inner = Factory::build($processes, Usleep::new());
-        $watch = Logger::psr($inner, new NullLogger);
+        $watch = Watch::logger($inner, new NullLogger);
 
         $either = $watch(Path::of('/tmp/innmind/watch-file'))(0, static function($count, $continuation) {
             ++$count;

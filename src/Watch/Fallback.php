@@ -3,13 +3,10 @@ declare(strict_types = 1);
 
 namespace Innmind\FileWatch\Watch;
 
-use Innmind\FileWatch\{
-    Watch,
-    Ping,
-};
+use Innmind\FileWatch\Ping;
 use Innmind\Url\Path;
 
-final class Fallback implements Watch
+final class Fallback
 {
     private Tailf $attempt;
     private Stat $fallback;
@@ -20,7 +17,6 @@ final class Fallback implements Watch
         $this->fallback = $fallback;
     }
 
-    #[\Override]
     public function __invoke(Path $file): Ping
     {
         return new Ping\Fallback(

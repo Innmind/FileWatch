@@ -3,13 +3,10 @@ declare(strict_types = 1);
 
 namespace Innmind\FileWatch\Watch;
 
-use Innmind\FileWatch\{
-    Watch,
-    Ping,
-};
+use Innmind\FileWatch\Ping;
 use Innmind\Url\Path;
 
-final class Kind implements Watch
+final class Kind
 {
     private Fallback $files;
     private Stat $directories;
@@ -20,7 +17,6 @@ final class Kind implements Watch
         $this->directories = $directories;
     }
 
-    #[\Override]
     public function __invoke(Path $file): Ping
     {
         return match ($file->directory()) {

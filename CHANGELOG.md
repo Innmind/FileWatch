@@ -5,6 +5,7 @@
 ### Changed
 
 - `Innmind\FileWatch\Ping::__invoke()` now returns an `Innmind\Immutable\Attempt`
+- `Innmind\FileWatch\Watch` is now a final class
 
 ### Fixed
 

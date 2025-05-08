@@ -14,19 +14,6 @@ final class Factory
         Halt $halt,
         ?Period $interval = null,
     ): Watch {
-        $files = new Watch\Tailf($processes);
-        $directories = new Watch\Stat(
-            $processes,
-            $halt,
-            $interval ?? Period::second(1),
-        );
-
-        return new Watch\Kind(
-            new Watch\Fallback(
-                $files,
-                $directories,
-            ),
-            $directories,
-        );
+        return Watch::of($processes, $halt, $interval);
     }
 }
