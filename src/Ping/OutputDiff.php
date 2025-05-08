@@ -48,6 +48,7 @@ final class OutputDiff implements Ping
      *
      * @return Maybe<R|C>
      */
+    #[\Override]
     public function __invoke(mixed $carry, callable $ping): Maybe
     {
         $previous = $this->output($carry);

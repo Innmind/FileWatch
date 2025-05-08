@@ -39,6 +39,7 @@ final class ProcessOutput implements Ping
      *
      * @return Maybe<R|C>
      */
+    #[\Override]
     public function __invoke(mixed $carry, callable $ping): Maybe
     {
         $process = $this->processes->execute($this->command);

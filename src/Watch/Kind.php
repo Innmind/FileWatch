@@ -20,6 +20,7 @@ final class Kind implements Watch
         $this->directories = $directories;
     }
 
+    #[\Override]
     public function __invoke(Path $file): Ping
     {
         return match ($file->directory()) {

@@ -22,6 +22,7 @@ final class Tailf implements Watch
         $this->processes = $processes;
     }
 
+    #[\Override]
     public function __invoke(Path $file): Ping
     {
         return new Ping\ProcessOutput(
