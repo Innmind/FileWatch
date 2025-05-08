@@ -42,7 +42,7 @@ final class ProcessOutput implements Ping
     #[\Override]
     public function __invoke(mixed $carry, callable $ping): Maybe
     {
-        $process = $this->processes->execute($this->command);
+        $process = $this->processes->execute($this->command)->unwrap();
 
         try {
             /**
@@ -51,9 +51,10 @@ final class ProcessOutput implements Ping
              */
             return $process
                 ->output()
+                ->map(static fn($chunk) => $chunk->type())
                 ->reduce(
                     Either::right($carry),
-                    function(Either $carry, $_, $type) use ($ping, $process): Either {
+                    function(Either $carry, $type) use ($ping, $process): Either {
                         // we may have a left as entry here because while we are
                         // killing the process there may still be output transiting
                         // up to here, but since we have a left value we no longer
