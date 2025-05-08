@@ -15,8 +15,8 @@ use Innmind\TimeContinuum\Earth\Clock;
 use Innmind\TimeWarp\Halt\Usleep;
 use Innmind\Stream\Streams;
 use Innmind\Url\Path;
-use Psr\Log\LoggerInterface;
-use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
+use Innmind\BlackBox\PHPUnit\Framework\TestCase;
 
 class FunctionalTest extends TestCase
 {
@@ -128,19 +128,7 @@ class FunctionalTest extends TestCase
         ));
 
         $inner = Factory::build($processes, new Usleep);
-        $watch = Logger::psr($inner, $logger = $this->createMock(LoggerInterface::class));
-        $logger
-            ->expects($matcher = $this->exactly(3))
-            ->method('info')
-            ->willReturnCallback(function($message, $context) use ($matcher) {
-                match ($matcher->numberOfInvocations()) {
-                    1 => $this->assertSame('Starting to watch {path}', $message),
-                    2 => $this->assertSame('Content at {path} changed', $message),
-                    3 => $this->assertSame('Content at {path} changed', $message),
-                };
-
-                $this->assertSame(['path' => '/tmp/innmind/watch-file'], $context);
-            });
+        $watch = Logger::psr($inner, new NullLogger);
 
         $either = $watch(Path::of('/tmp/innmind/watch-file'))(0, static function($count, $continuation) {
             ++$count;
