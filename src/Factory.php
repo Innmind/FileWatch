@@ -15,7 +15,7 @@ final class Factory
     public static function build(
         Processes $processes,
         Halt $halt,
-        Period $interval = null,
+        ?Period $interval = null,
     ): Watch {
         $files = new Watch\Tailf($processes);
         $directories = new Watch\Stat(
