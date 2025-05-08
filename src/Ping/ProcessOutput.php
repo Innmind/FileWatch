@@ -21,13 +21,10 @@ use Innmind\Immutable\{
  */
 final class ProcessOutput implements Implementation
 {
-    private Processes $processes;
-    private Command $command;
-
-    public function __construct(Processes $processes, Command $command)
-    {
-        $this->processes = $processes;
-        $this->command = $command;
+    public function __construct(
+        private Processes $processes,
+        private Command $command,
+    ) {
     }
 
     /**

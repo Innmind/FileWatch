@@ -15,11 +15,9 @@ use Innmind\Server\Control\Server\{
  */
 final class Tailf
 {
-    private Processes $processes;
-
-    public function __construct(Processes $processes)
-    {
-        $this->processes = $processes;
+    public function __construct(
+        private Processes $processes,
+    ) {
     }
 
     public function __invoke(Path $file): Ping\ProcessOutput

@@ -10,13 +10,10 @@ use Innmind\Immutable\Attempt;
  */
 final class Fallback implements Implementation
 {
-    private ProcessOutput $attempt;
-    private OutputDiff $fallback;
-
-    public function __construct(ProcessOutput $attempt, OutputDiff $fallback)
-    {
-        $this->attempt = $attempt;
-        $this->fallback = $fallback;
+    public function __construct(
+        private ProcessOutput $attempt,
+        private OutputDiff $fallback,
+    ) {
     }
 
     #[\Override]

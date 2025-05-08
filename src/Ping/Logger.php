@@ -13,18 +13,11 @@ use Psr\Log\LoggerInterface;
  */
 final class Logger implements Implementation
 {
-    private Implementation $ping;
-    private Path $path;
-    private LoggerInterface $logger;
-
     private function __construct(
-        Implementation $ping,
-        Path $path,
-        LoggerInterface $logger,
+        private Implementation $ping,
+        private Path $path,
+        private LoggerInterface $logger,
     ) {
-        $this->ping = $ping;
-        $this->path = $path;
-        $this->logger = $logger;
     }
 
     /**
