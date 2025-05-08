@@ -24,21 +24,12 @@ use Innmind\Immutable\{
  */
 final class OutputDiff implements Implementation
 {
-    private Processes $processes;
-    private Command $command;
-    private Halt $halt;
-    private Period $period;
-
     public function __construct(
-        Processes $processes,
-        Command $command,
-        Halt $halt,
-        Period $period,
+        private Processes $processes,
+        private Command $command,
+        private Halt $halt,
+        private Period $period,
     ) {
-        $this->processes = $processes;
-        $this->command = $command;
-        $this->halt = $halt;
-        $this->period = $period;
     }
 
     /**

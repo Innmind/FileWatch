@@ -11,13 +11,10 @@ use Innmind\Url\Path;
  */
 final class Fallback
 {
-    private Tailf $attempt;
-    private Stat $fallback;
-
-    public function __construct(Tailf $attempt, Stat $fallback)
-    {
-        $this->attempt = $attempt;
-        $this->fallback = $fallback;
+    public function __construct(
+        private Tailf $attempt,
+        private Stat $fallback,
+    ) {
     }
 
     public function __invoke(Path $file): Ping\Implementation

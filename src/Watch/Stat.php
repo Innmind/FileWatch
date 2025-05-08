@@ -17,18 +17,11 @@ use Innmind\TimeContinuum\Period;
  */
 final class Stat
 {
-    private Processes $processes;
-    private Halt $halt;
-    private Period $period;
-
     public function __construct(
-        Processes $processes,
-        Halt $halt,
-        Period $period,
+        private Processes $processes,
+        private Halt $halt,
+        private Period $period,
     ) {
-        $this->processes = $processes;
-        $this->halt = $halt;
-        $this->period = $period;
     }
 
     public function __invoke(Path $file): Ping\OutputDiff

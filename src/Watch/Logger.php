@@ -12,13 +12,10 @@ use Psr\Log\LoggerInterface;
  */
 final class Logger
 {
-    private Kind $watch;
-    private LoggerInterface $logger;
-
-    private function __construct(Kind $watch, LoggerInterface $logger)
-    {
-        $this->watch = $watch;
-        $this->logger = $logger;
+    private function __construct(
+        private Kind $watch,
+        private LoggerInterface $logger,
+    ) {
     }
 
     public function __invoke(Path $path): Ping\Implementation

@@ -11,13 +11,10 @@ use Innmind\Url\Path;
  */
 final class Kind
 {
-    private Fallback $files;
-    private Stat $directories;
-
-    public function __construct(Fallback $files, Stat $directories)
-    {
-        $this->files = $files;
-        $this->directories = $directories;
+    public function __construct(
+        private Fallback $files,
+        private Stat $directories,
+    ) {
     }
 
     public function __invoke(Path $file): Ping\Implementation
