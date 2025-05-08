@@ -21,6 +21,7 @@ final class Logger implements Watch
         $this->logger = $logger;
     }
 
+    #[\Override]
     public function __invoke(Path $path): Ping
     {
         return Ping\Logger::psr(

@@ -31,6 +31,7 @@ final class Stat implements Watch
         $this->period = $period;
     }
 
+    #[\Override]
     public function __invoke(Path $file): Ping
     {
         if (\PHP_OS === 'Linux') {

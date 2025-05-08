@@ -20,6 +20,7 @@ final class Fallback implements Watch
         $this->fallback = $fallback;
     }
 
+    #[\Override]
     public function __invoke(Path $file): Ping
     {
         return new Ping\Fallback(

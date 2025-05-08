@@ -17,6 +17,7 @@ final class Fallback implements Ping
         $this->fallback = $fallback;
     }
 
+    #[\Override]
     public function __invoke(mixed $carry, callable $ping): Maybe
     {
         return ($this->attempt)($carry, $ping)->otherwise(
