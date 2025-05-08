@@ -11,10 +11,10 @@ use Innmind\Url\Path;
 
 final class Kind implements Watch
 {
-    private Watch $files;
-    private Watch $directories;
+    private Fallback $files;
+    private Stat $directories;
 
-    public function __construct(Watch $files, Watch $directories)
+    public function __construct(Fallback $files, Stat $directories)
     {
         $this->files = $files;
         $this->directories = $directories;

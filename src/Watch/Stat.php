@@ -32,7 +32,7 @@ final class Stat implements Watch
     }
 
     #[\Override]
-    public function __invoke(Path $file): Ping
+    public function __invoke(Path $file): Ping\OutputDiff
     {
         if (\PHP_OS === 'Linux') {
             $stat = Command::foreground('xargs')

@@ -11,10 +11,10 @@ use Innmind\Url\Path;
 
 final class Fallback implements Watch
 {
-    private Watch $attempt;
-    private Watch $fallback;
+    private Tailf $attempt;
+    private Stat $fallback;
 
-    public function __construct(Watch $attempt, Watch $fallback)
+    public function __construct(Tailf $attempt, Stat $fallback)
     {
         $this->attempt = $attempt;
         $this->fallback = $fallback;
