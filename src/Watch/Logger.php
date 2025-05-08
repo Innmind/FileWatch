@@ -7,6 +7,9 @@ use Innmind\FileWatch\Ping;
 use Innmind\Url\Path;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @internal
+ */
 final class Logger
 {
     private Kind $watch;

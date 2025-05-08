@@ -19,6 +19,9 @@ use Innmind\Immutable\{
     Predicate\Instance,
 };
 
+/**
+ * @internal
+ */
 final class OutputDiff implements Implementation
 {
     private Processes $processes;

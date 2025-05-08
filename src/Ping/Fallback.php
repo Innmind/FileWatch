@@ -5,6 +5,9 @@ namespace Innmind\FileWatch\Ping;
 
 use Innmind\Immutable\Attempt;
 
+/**
+ * @internal
+ */
 final class Fallback implements Implementation
 {
     private ProcessOutput $attempt;

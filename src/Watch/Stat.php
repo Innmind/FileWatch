@@ -12,6 +12,9 @@ use Innmind\Server\Control\Server\{
 use Innmind\TimeWarp\Halt;
 use Innmind\TimeContinuum\Period;
 
+/**
+ * @internal
+ */
 final class Stat
 {
     private Processes $processes;

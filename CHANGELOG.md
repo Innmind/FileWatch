@@ -7,6 +7,7 @@
 - `Innmind\FileWatch\Ping::__invoke()` now returns an `Innmind\Immutable\Attempt`
 - `Innmind\FileWatch\Watch` is now a final class
 - `Innmind\FileWatch\Ping` is now a final class
+- All classes in `Innmind\FileWatch\Watch\*` and `Innmind\FileWatch\Ping\*` are now flagged as internal
 
 ### Fixed
 

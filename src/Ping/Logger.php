@@ -8,6 +8,9 @@ use Innmind\Url\Path;
 use Innmind\Immutable\Attempt;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @internal
+ */
 final class Logger implements Implementation
 {
     private Implementation $ping;
@@ -56,6 +59,9 @@ final class Logger implements Implementation
         });
     }
 
+    /**
+     * @internal
+     */
     public static function psr(
         Implementation $ping,
         Path $path,

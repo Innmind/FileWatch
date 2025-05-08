@@ -16,6 +16,9 @@ use Innmind\Immutable\{
     SideEffect,
 };
 
+/**
+ * @internal
+ */
 final class ProcessOutput implements Implementation
 {
     private Processes $processes;

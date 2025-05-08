@@ -10,6 +10,9 @@ use Innmind\Server\Control\Server\{
     Command,
 };
 
+/**
+ * @internal
+ */
 final class Tailf
 {
     private Processes $processes;

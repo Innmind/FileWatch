@@ -6,6 +6,9 @@ namespace Innmind\FileWatch\Watch;
 use Innmind\FileWatch\Ping;
 use Innmind\Url\Path;
 
+/**
+ * @internal
+ */
 final class Fallback
 {
     private Tailf $attempt;
