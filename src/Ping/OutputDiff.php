@@ -18,6 +18,8 @@ use Innmind\TimeContinuum\Period;
 use Innmind\Immutable\{
     Either,
     Maybe,
+    Sequence,
+    Monoid\Concat,
 };
 
 final class OutputDiff implements Ping
@@ -84,14 +86,16 @@ final class OutputDiff implements Ping
      * @template C
      * @template R
      *
+     * @param Sequence<Output\Chunk> $previous
+     * @param Sequence<Output\Chunk> $output
      * @param callable(R|C, Continuation<R|C>): Continuation<R> $ping
      * @param C $carry
      *
-     * @return Either<Stop<R|C>, array{0: Output, 1: R|C}>
+     * @return Either<Stop<R|C>, array{0: Sequence<Output\Chunk>, 1: R|C}>
      */
     private function maybePing(
-        Output $previous,
-        Output $output,
+        Sequence $previous,
+        Sequence $output,
         callable $ping,
         mixed $carry,
     ): Either {
@@ -110,29 +114,42 @@ final class OutputDiff implements Ping
      *
      * @param C $carry
      *
-     * @return Either<Failed, array{0: Output, 1: C}>
+     * @return Either<Failed, array{0: Sequence<Output\Chunk>, 1: C}>
      */
     private function output(mixed $carry): Either
     {
         return $this
             ->processes
             ->execute($this->command)
+            ->unwrap()
             ->wait()
             ->leftMap(static fn() => new Failed)
             ->map(static fn($success) => $success->output())
             ->filter(
-                static fn($output) => $output
-                    ->filter(static fn($_, $type) => $type === Type::error)
-                    ->chunks()
-                    ->empty(),
+                static fn($output) => !$output->any(
+                    static fn($chunk) => $chunk->type() === Type::error,
+                ),
                 static fn() => new Failed,
             )
             ->map(static fn($output) => [$output, $carry]);
     }
 
-    private function diff(Output $previous, Output $now): bool
+    /**
+     * @param Sequence<Output\Chunk> $previous
+     * @param Sequence<Output\Chunk> $now
+     */
+    private function diff(Sequence $previous, Sequence $now): bool
     {
-        return $previous->toString() !== $now->toString();
+        $previous = $previous
+            ->map(static fn($chunk) => $chunk->data())
+            ->fold(new Concat)
+            ->toString();
+        $now = $now
+            ->map(static fn($chunk) => $chunk->data())
+            ->fold(new Concat)
+            ->toString();
+
+        return $previous !== $now;
     }
 
     /**

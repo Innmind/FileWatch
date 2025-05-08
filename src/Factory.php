@@ -5,10 +5,7 @@ namespace Innmind\FileWatch;
 
 use Innmind\Server\Control\Server\Processes;
 use Innmind\TimeWarp\Halt;
-use Innmind\TimeContinuum\{
-    Period,
-    Earth\Period\Second,
-};
+use Innmind\TimeContinuum\Period;
 
 final class Factory
 {
@@ -21,7 +18,7 @@ final class Factory
         $directories = new Watch\Stat(
             $processes,
             $halt,
-            $interval ?? new Second(1),
+            $interval ?? Period::second(1),
         );
 
         return new Watch\Kind(
