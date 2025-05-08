@@ -14,10 +14,7 @@ use Innmind\Server\Control\Server\{
     Signal,
     Process\Output\Type,
 };
-use Innmind\Immutable\{
-    Either,
-    Maybe,
-};
+use Innmind\Immutable\Maybe;
 
 final class ProcessOutput implements Ping
 {
@@ -43,50 +40,32 @@ final class ProcessOutput implements Ping
     public function __invoke(mixed $carry, callable $ping): Maybe
     {
         $process = $this->processes->execute($this->command)->unwrap();
+        $failed = new \stdClass;
 
         try {
-            /**
-             * @psalm-suppress InvalidArgument Due to the reduce where Either types are not enterily defined
-             * @var Maybe<R|C>
-             */
-            return $process
+            $carry = $process
                 ->output()
                 ->map(static fn($chunk) => $chunk->type())
-                ->reduce(
-                    Either::right($carry),
-                    function(Either $carry, $type) use ($ping, $process): Either {
-                        // we may have a left as entry here because while we are
-                        // killing the process there may still be output transiting
-                        // up to here, but since we have a left value we no longer
-                        // want the $ping to be called
-                        $stopping = $carry->match(
-                            static fn() => false,
-                            static fn() => true,
-                        );
+                ->sink($carry)
+                ->until(static function($carry, $type, $continuation) use ($ping, $failed) {
+                    if ($type === Type::error) {
+                        /** @psalm-suppress InvalidArgument */
+                        return $continuation->stop($failed);
+                    }
 
-                        if ($stopping) {
-                            return $carry;
-                        }
+                    /** @psalm-suppress MixedArgument */
+                    return $ping($carry, Continuation::of($carry))->match(
+                        $continuation->continue(...),
+                        $continuation->stop(...),
+                    );
+                });
 
-                        if ($type === Type::error) {
-                            $carry = Either::left(new Failed);
-                        }
+            $this->kill($process);
 
-                        /** @psalm-suppress MixedArgument Doesn't understand the type of $carry when calling $ping */
-                        return $carry
-                            ->flatMap(static fn($carry) => $ping($carry, Continuation::of($carry))->match(
-                                Either::right(...),
-                                static fn($value) => Either::left(Stop::of($value)),
-                            ))
-                            ->leftMap(function($left) use ($process) {
-                                $this->kill($process);
-
-                                return $left;
-                            });
-                    },
-                )
-                ->otherwise($this->switchStopValue(...))
-                ->maybe();
+            return match ($carry) {
+                $failed => Maybe::nothing(),
+                default => Maybe::just($carry),
+            };
         } catch (\Throwable $e) {
             $this->kill($process);
 
@@ -100,22 +79,5 @@ final class ProcessOutput implements Ping
             fn($pid) => $this->processes->kill($pid, Signal::terminate),
             static fn() => null,
         );
-    }
-
-    /**
-     * @template C
-     * @template R
-     *
-     * @param R|Stop<C>|Failed $value
-     *
-     * @return Either<Failed, R|C>
-     */
-    private function switchStopValue(mixed $value): Either
-    {
-        return match (true) {
-            $value instanceof Stop => Either::right($value->value()),
-            $value instanceof Failed => Either::left($value),
-            default => Either::right($value),
-        };
     }
 }
