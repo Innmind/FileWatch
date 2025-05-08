@@ -29,7 +29,8 @@ final class Tailf implements Watch
             $this->processes,
             Command::foreground('tail')
                 ->withShortOption('f')
-                ->withArgument($file->toString()),
+                ->withArgument($file->toString())
+                ->streamOutput(),
         );
     }
 }
