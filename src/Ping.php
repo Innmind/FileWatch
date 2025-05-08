@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Innmind\FileWatch;
 
-use Innmind\Immutable\Maybe;
+use Innmind\Immutable\Attempt;
 
 interface Ping
 {
@@ -14,7 +14,7 @@ interface Ping
      * @param C $carry
      * @param callable(R|C, Continuation<R|C>): Continuation<R> $ping
      *
-     * @return Maybe<R|C>
+     * @return Attempt<R|C>
      */
-    public function __invoke(mixed $carry, callable $ping): Maybe;
+    public function __invoke(mixed $carry, callable $ping): Attempt;
 }
