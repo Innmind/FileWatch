@@ -15,7 +15,7 @@
         "issues": "http://github.com/Innmind/FileWatch/issues"
     },
     "require": {
-        "php": "~8.2",
+        "php": "~8.4",
         "innmind/url": "~4.0",
         "innmind/server-control": "~6.0",
         "innmind/time-warp": "~4.0",
