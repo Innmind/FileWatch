@@ -16,10 +16,16 @@
     },
     "require": {
         "php": "~8.4",
-        "innmind/url": "~4.0",
-        "innmind/server-control": "~6.0",
-        "innmind/time-warp": "~4.0",
-        "innmind/time-continuum": "^4.1.1",
+        "innmind/url": "dev-next",
+        "innmind/server-control": "dev-next",
+        "innmind/time-warp": "dev-next",
+        "innmind/time-continuum": "dev-next",
+        "innmind/filesystem": "dev-next",
+        "innmind/io": "dev-next",
+        "innmind/media-type": "dev-next",
+        "innmind/validation": "dev-next",
+        "innmind/ip": "dev-next",
+        "innmind/immutable": "dev-next",
         "psr/log": "~3.0"
     },
     "autoload": {
