@@ -4,8 +4,10 @@ declare(strict_types = 1);
 namespace Innmind\FileWatch;
 
 use Innmind\Server\Control\Server\Processes;
-use Innmind\TimeWarp\Halt;
-use Innmind\TimeContinuum\Period;
+use Innmind\Time\{
+    Halt,
+    Period,
+};
 
 final class Factory
 {

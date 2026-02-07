@@ -12,8 +12,10 @@ use Innmind\FileWatch\Watch\{
     Stat,
 };
 use Innmind\Server\Control\Server\Processes;
-use Innmind\TimeWarp\Halt;
-use Innmind\TimeContinuum\Period;
+use Innmind\Time\{
+    Halt,
+    Period,
+};
 use Innmind\Url\Path;
 use Psr\Log\LoggerInterface;
 
