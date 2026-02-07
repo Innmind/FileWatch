@@ -49,7 +49,7 @@ final class OutputDiff implements Implementation
         $result = Sequence::lazy(function() {
             while (true) {
                 yield $this->output();
-                ($this->halt)($this->period);
+                $_ = ($this->halt)($this->period)->memoize();
             }
         })
             ->flatMap(static fn($maybe) => $maybe->match(
@@ -136,11 +136,11 @@ final class OutputDiff implements Implementation
     {
         $previous = $previous
             ->map(static fn($chunk) => $chunk->data())
-            ->fold(new Concat)
+            ->fold(Concat::monoid)
             ->toString();
         $now = $now
             ->map(static fn($chunk) => $chunk->data())
-            ->fold(new Concat)
+            ->fold(Concat::monoid)
             ->toString();
 
         return $previous !== $now;

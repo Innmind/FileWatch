@@ -5,6 +5,7 @@
 ### Changed
 
 - Requires PHP `8.4`
+- Requires `innmind/server-control:~7.0`
 
 ## 5.0.0 - 2025-05-08
 

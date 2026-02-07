@@ -125,7 +125,7 @@ class FunctionalTest extends TestCase
         )->processes();
         $process = $processes->execute(Command::background(
             'sleep 1 && echo foo >> /tmp/innmind/watch-file && sleep 1 && echo foo >> /tmp/innmind/watch-file && sleep 1 && echo foo >> /tmp/innmind/watch-file',
-        ));
+        ))->unwrap();
 
         $inner = Factory::build($processes, Halt::new());
         $watch = Watch::logger($inner, new NullLogger);
