@@ -11,8 +11,10 @@ use Innmind\Server\Control\{
     ServerFactory,
     Server\Command,
 };
-use Innmind\TimeContinuum\Clock;
-use Innmind\TimeWarp\Halt;
+use Innmind\Time\{
+    Clock,
+    Halt,
+};
 use Innmind\IO\IO;
 use Innmind\Url\Path;
 use Psr\Log\NullLogger;

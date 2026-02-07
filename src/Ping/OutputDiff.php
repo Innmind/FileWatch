@@ -10,8 +10,10 @@ use Innmind\Server\Control\Server\{
     Process\Output,
     Process\Output\Type,
 };
-use Innmind\TimeWarp\Halt;
-use Innmind\TimeContinuum\Period;
+use Innmind\Time\{
+    Halt,
+    Period,
+};
 use Innmind\Immutable\{
     Attempt,
     Sequence,
