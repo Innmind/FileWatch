@@ -15,12 +15,9 @@ composer require innmind/file-watch
 ## Usage
 
 ```php
-use Innmind\FileWatch\{
-    Factory,
-    Stop,
-};
+use Innmind\FileWatch\Factory;
 use Innmind\Server\Control\ServerFactory;
-use Innmind\TimeWarp\Halt\Usleep;
+use Innmind\TimeWarp\Halt;
 use Innmind\TimeContinuum\Clock;
 use Innmind\IO\IO;
 use Innmind\Url\Path;
@@ -30,9 +27,9 @@ $watch = Factory::build(
     ServerFactory::build(
         Clock::live(),
         IO::fromAmbientAuthority(),
-        Usleep::new(),
+        Halt::new(),
     )->processes(),
-    Usleep::new(),
+    Halt::new(),
 );
 
 $count = $watch(Path::of('/to/some/file/or/folder'))(0, function(int $count, Continuation $continuation): Continuation {
