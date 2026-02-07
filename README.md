@@ -1,6 +1,6 @@
 # FileWatch
 
-[![Build Status](https://github.com/innmind/filewatch/workflows/CI/badge.svg?branch=master)](https://github.com/innmind/filewatch/actions?query=workflow%3ACI)
+[![CI](https://github.com/Innmind/FileWatch/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/Innmind/FileWatch/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/innmind/filewatch/branch/develop/graph/badge.svg)](https://codecov.io/gh/innmind/filewatch)
 [![Type Coverage](https://shepherd.dev/github/innmind/filewatch/coverage.svg)](https://shepherd.dev/github/innmind/filewatch)
 
@@ -15,12 +15,9 @@ composer require innmind/file-watch
 ## Usage
 
 ```php
-use Innmind\FileWatch\{
-    Factory,
-    Stop,
-};
+use Innmind\FileWatch\Factory;
 use Innmind\Server\Control\ServerFactory;
-use Innmind\TimeWarp\Halt\Usleep;
+use Innmind\TimeWarp\Halt;
 use Innmind\TimeContinuum\Clock;
 use Innmind\IO\IO;
 use Innmind\Url\Path;
@@ -30,9 +27,9 @@ $watch = Factory::build(
     ServerFactory::build(
         Clock::live(),
         IO::fromAmbientAuthority(),
-        Usleep::new(),
+        Halt::new(),
     )->processes(),
-    Usleep::new(),
+    Halt::new(),
 );
 
 $count = $watch(Path::of('/to/some/file/or/folder'))(0, function(int $count, Continuation $continuation): Continuation {

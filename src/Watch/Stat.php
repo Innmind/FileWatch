@@ -9,8 +9,10 @@ use Innmind\Server\Control\Server\{
     Processes,
     Command,
 };
-use Innmind\TimeWarp\Halt;
-use Innmind\TimeContinuum\Period;
+use Innmind\Time\{
+    Halt,
+    Period,
+};
 
 /**
  * @internal

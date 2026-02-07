@@ -7,12 +7,14 @@ use Innmind\FileWatch\{
     Factory,
     Watch,
 };
-use Innmind\Server\Control\Server\{
-    Processes\Unix,
-    Command,
+use Innmind\Server\Control\{
+    ServerFactory,
+    Server\Command,
 };
-use Innmind\TimeContinuum\Clock;
-use Innmind\TimeWarp\Halt\Usleep;
+use Innmind\Time\{
+    Clock,
+    Halt,
+};
 use Innmind\IO\IO;
 use Innmind\Url\Path;
 use Psr\Log\NullLogger;
@@ -34,16 +36,16 @@ class FunctionalTest extends TestCase
     public function testWatchFile()
     {
         \touch('/tmp/innmind/watch-file');
-        $processes = Unix::of(
+        $processes = ServerFactory::build(
             Clock::live(),
             IO::fromAmbientAuthority(),
-            Usleep::new(),
-        );
+            Halt::new(),
+        )->processes();
         $process = $processes->execute(Command::background(
             'sleep 1 && echo foo >> /tmp/innmind/watch-file && sleep 1 && echo foo >> /tmp/innmind/watch-file && sleep 1 && echo foo >> /tmp/innmind/watch-file',
         ));
 
-        $watch = Factory::build($processes, Usleep::new());
+        $watch = Factory::build($processes, Halt::new());
 
         $either = $watch(Path::of('/tmp/innmind/watch-file'))(0, static function($count, $continuation) {
             ++$count;
@@ -66,16 +68,16 @@ class FunctionalTest extends TestCase
 
     public function testWatchDirectory()
     {
-        $processes = Unix::of(
+        $processes = ServerFactory::build(
             Clock::live(),
             IO::fromAmbientAuthority(),
-            Usleep::new(),
-        );
+            Halt::new(),
+        )->processes();
         $process = $processes->execute(Command::background(
             'sleep 1 && touch /tmp/innmind/watch-file && sleep 1 && rm /tmp/innmind/watch-file',
         ));
 
-        $watch = Factory::build($processes, Usleep::new());
+        $watch = Factory::build($processes, Halt::new());
 
         $either = $watch(Path::of('/tmp/innmind/'))(0, static function($count, $continuation) {
             ++$count;
@@ -98,13 +100,13 @@ class FunctionalTest extends TestCase
 
     public function testReturnErrorWhenWatchingUnknownFile()
     {
-        $processes = Unix::of(
+        $processes = ServerFactory::build(
             Clock::live(),
             IO::fromAmbientAuthority(),
-            Usleep::new(),
-        );
+            Halt::new(),
+        )->processes();
 
-        $watch = Factory::build($processes, Usleep::new());
+        $watch = Factory::build($processes, Halt::new());
 
         $either = $watch(Path::of('/unknown/'))(null, static fn($_, $continuation) => $continuation);
 
@@ -118,16 +120,16 @@ class FunctionalTest extends TestCase
     public function testLog()
     {
         \touch('/tmp/innmind/watch-file');
-        $processes = Unix::of(
+        $processes = ServerFactory::build(
             Clock::live(),
             IO::fromAmbientAuthority(),
-            Usleep::new(),
-        );
+            Halt::new(),
+        )->processes();
         $process = $processes->execute(Command::background(
             'sleep 1 && echo foo >> /tmp/innmind/watch-file && sleep 1 && echo foo >> /tmp/innmind/watch-file && sleep 1 && echo foo >> /tmp/innmind/watch-file',
-        ));
+        ))->unwrap();
 
-        $inner = Factory::build($processes, Usleep::new());
+        $inner = Factory::build($processes, Halt::new());
         $watch = Watch::logger($inner, new NullLogger);
 
         $either = $watch(Path::of('/tmp/innmind/watch-file'))(0, static function($count, $continuation) {

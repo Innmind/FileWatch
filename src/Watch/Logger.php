@@ -10,14 +10,15 @@ use Psr\Log\LoggerInterface;
 /**
  * @internal
  */
-final class Logger
+final class Logger implements Implementation
 {
     private function __construct(
-        private Kind $watch,
+        private Implementation $watch,
         private LoggerInterface $logger,
     ) {
     }
 
+    #[\Override]
     public function __invoke(Path $path): Ping\Implementation
     {
         return Ping\Logger::psr(
@@ -27,17 +28,8 @@ final class Logger
         );
     }
 
-    public static function psr(Kind|self $watch, LoggerInterface $logger): self
+    public static function psr(Implementation $watch, LoggerInterface $logger): self
     {
-        return new self(self::extract($watch), $logger);
-    }
-
-    private static function extract(Kind|self $watch): Kind
-    {
-        if ($watch instanceof Kind) {
-            return $watch;
-        }
-
-        return self::extract($watch->watch);
+        return new self($watch, $logger);
     }
 }

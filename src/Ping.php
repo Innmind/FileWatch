@@ -21,6 +21,7 @@ final class Ping
      *
      * @return Attempt<R|C>
      */
+    #[\NoDiscard]
     public function __invoke(mixed $carry, callable $ping): Attempt
     {
         return ($this->implementation)($carry, $ping);
@@ -29,6 +30,7 @@ final class Ping
     /**
      * @internal
      */
+    #[\NoDiscard]
     public static function of(Ping\Implementation $implementation): self
     {
         return new self($implementation);

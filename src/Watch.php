@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Innmind\FileWatch;
 
 use Innmind\FileWatch\Watch\{
+    Implementation,
     Kind,
     Logger,
     Fallback,
@@ -11,23 +12,27 @@ use Innmind\FileWatch\Watch\{
     Stat,
 };
 use Innmind\Server\Control\Server\Processes;
-use Innmind\TimeWarp\Halt;
-use Innmind\TimeContinuum\Period;
+use Innmind\Time\{
+    Halt,
+    Period,
+};
 use Innmind\Url\Path;
 use Psr\Log\LoggerInterface;
 
 final class Watch
 {
     private function __construct(
-        private Kind|Logger $implementation,
+        private Implementation $implementation,
     ) {
     }
 
+    #[\NoDiscard]
     public function __invoke(Path $file): Ping
     {
         return Ping::of(($this->implementation)($file));
     }
 
+    #[\NoDiscard]
     public static function of(
         Processes $processes,
         Halt $halt,
@@ -51,6 +56,7 @@ final class Watch
         );
     }
 
+    #[\NoDiscard]
     public static function logger(self $watch, LoggerInterface $logger): self
     {
         return new self(Logger::psr(
