@@ -18,8 +18,8 @@
         "php": "~8.4",
         "innmind/url": "~5.0",
         "innmind/server-control": "~7.0",
-        "innmind/time-warp": "~5.0",
-        "innmind/time-continuum": "~5.0",
+        "innmind/time-warp": "~5.1",
+        "innmind/time-continuum": "~5.1",
         "psr/log": "~3.0"
     },
     "autoload": {
