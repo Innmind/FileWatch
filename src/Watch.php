@@ -26,11 +26,13 @@ final class Watch
     ) {
     }
 
+    #[\NoDiscard]
     public function __invoke(Path $file): Ping
     {
         return Ping::of(($this->implementation)($file));
     }
 
+    #[\NoDiscard]
     public static function of(
         Processes $processes,
         Halt $halt,
@@ -54,6 +56,7 @@ final class Watch
         );
     }
 
+    #[\NoDiscard]
     public static function logger(self $watch, LoggerInterface $logger): self
     {
         return new self(Logger::psr(

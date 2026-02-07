@@ -11,6 +11,7 @@ use Innmind\Time\{
 
 final class Factory
 {
+    #[\NoDiscard]
     public static function build(
         Processes $processes,
         Halt $halt,

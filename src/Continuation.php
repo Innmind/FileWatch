@@ -29,6 +29,7 @@ final class Continuation
      *
      * @return self<A>
      */
+    #[\NoDiscard]
     public static function of(mixed $value): self
     {
         return new self(State::continue, $value);
@@ -41,6 +42,7 @@ final class Continuation
      *
      * @return self<U>
      */
+    #[\NoDiscard]
     public function continue(mixed $value): self
     {
         return new self(State::continue, $value);
@@ -53,6 +55,7 @@ final class Continuation
      *
      * @return self<U>
      */
+    #[\NoDiscard]
     public function stop(mixed $value): self
     {
         return new self(State::stop, $value);
@@ -67,6 +70,7 @@ final class Continuation
      *
      * @return R
      */
+    #[\NoDiscard]
     public function match(
         callable $continue,
         callable $stop,
