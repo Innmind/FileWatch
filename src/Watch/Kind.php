@@ -9,7 +9,7 @@ use Innmind\Url\Path;
 /**
  * @internal
  */
-final class Kind
+final class Kind implements Implementation
 {
     public function __construct(
         private Fallback $files,
@@ -17,6 +17,7 @@ final class Kind
     ) {
     }
 
+    #[\Override]
     public function __invoke(Path $file): Ping\Implementation
     {
         return match ($file->directory()) {

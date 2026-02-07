@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Innmind\FileWatch;
 
 use Innmind\FileWatch\Watch\{
+    Implementation,
     Kind,
     Logger,
     Fallback,
@@ -19,7 +20,7 @@ use Psr\Log\LoggerInterface;
 final class Watch
 {
     private function __construct(
-        private Kind|Logger $implementation,
+        private Implementation $implementation,
     ) {
     }
 
