@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- When the process to check for a directory change fails it raised a PHP error
+
 ## 6.0.0 - 2026-02-07
 
 ### Changed

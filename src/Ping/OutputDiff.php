@@ -110,7 +110,7 @@ final class OutputDiff implements Implementation
         return $this
             ->processes
             ->execute($this->command)
-            ->flatMap(static fn($process) => $process->wait()->match(
+            ->flatMap(fn($process) => $process->wait()->match(
                 Attempt::result(...),
                 fn() => Attempt::error(new \RuntimeException(\sprintf(
                     'Failed to run command "%s"',
