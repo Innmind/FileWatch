@@ -38,12 +38,65 @@ final class Watch
         Halt $halt,
         ?Period $interval = null,
     ): self {
-        $files = new Tailf($processes);
-        $directories = new Stat(
+        return match (\PHP_OS) {
+            'Linux' => self::linux($processes, $halt, $interval),
+            'Darwin' => self::osx($processes, $halt, $interval),
+        };
+    }
+
+    #[\NoDiscard]
+    public static function logger(self $watch, LoggerInterface $logger): self
+    {
+        return new self(Logger::psr(
+            $watch->implementation,
+            $logger,
+        ));
+    }
+
+    /**
+     * @internal
+     */
+    public static function linux(
+        Processes $processes,
+        Halt $halt,
+        ?Period $interval = null,
+    ): self {
+        return self::new(
             $processes,
             $halt,
-            $interval ?? Period::second(1),
+            Stat::linux(
+                $processes,
+                $halt,
+                $interval ?? Period::second(1),
+            ),
         );
+    }
+
+    /**
+     * @internal
+     */
+    public static function osx(
+        Processes $processes,
+        Halt $halt,
+        ?Period $interval = null,
+    ): self {
+        return self::new(
+            $processes,
+            $halt,
+            Stat::osx(
+                $processes,
+                $halt,
+                $interval ?? Period::second(1),
+            ),
+        );
+    }
+
+    private static function new(
+        Processes $processes,
+        Halt $halt,
+        Stat $directories,
+    ): self {
+        $files = new Tailf($processes);
 
         return new self(
             new Kind(
@@ -54,14 +107,5 @@ final class Watch
                 $directories,
             ),
         );
-    }
-
-    #[\NoDiscard]
-    public static function logger(self $watch, LoggerInterface $logger): self
-    {
-        return new self(Logger::psr(
-            $watch->implementation,
-            $logger,
-        ));
     }
 }
