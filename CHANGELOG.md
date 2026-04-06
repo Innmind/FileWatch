@@ -1,5 +1,11 @@
 # Changelog
 
+## 6.0.2 - 2026-04-06
+
+### Fixed
+
+- The OS check was done at runtime instead of build time (preventing simulation on different OSes)
+
 ## 6.0.1 - 2026-02-22
 
 ### Fixed
