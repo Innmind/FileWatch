@@ -2,7 +2,10 @@
     "name": "innmind/file-watch",
     "type": "library",
     "description": "Library to execute code when a file changes",
-    "keywords": ["file", "watch"],
+    "keywords": [
+        "file",
+        "watch"
+    ],
     "homepage": "http://github.com/Innmind/FileWatch",
     "license": "MIT",
     "authors": [
