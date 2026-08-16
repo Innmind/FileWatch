@@ -1,6 +1,6 @@
 # FileWatch
 
-[![CI](https://github.com/Innmind/FileWatch/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/Innmind/FileWatch/actions/workflows/ci.yml)
+[![CI](https://github.com/Innmind/FileWatch/actions/workflows/ci.yml/badge.svg)](https://github.com/Innmind/FileWatch/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/innmind/filewatch/branch/develop/graph/badge.svg)](https://codecov.io/gh/innmind/filewatch)
 [![Type Coverage](https://shepherd.dev/github/innmind/filewatch/coverage.svg)](https://shepherd.dev/github/innmind/filewatch)
 
